@@ -48,7 +48,7 @@ const ShowTasks : React.FC<{ setPage: Function; allTasksList: any , setSelectedT
                     </td>
                     <td className="border-b border-[#eee] py-5 px-4 dark:border-strokedark">
                     <p className="text-black dark:text-white">
-                        {task.landmark.name}
+                        {/* {task.landmark.name} */}
                     </p>
                     </td>
                     <td className="border-b border-[#eee] py-5 px-4 dark:border-strokedark">

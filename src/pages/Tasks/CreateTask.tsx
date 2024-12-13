@@ -1,128 +1,126 @@
 import React, { useState } from "react";
 import { useEffect } from "react";
 // import { postToServer } from "../../globals/requests";
-import MultiSelect from "./MultiSelect";
 import { getFromServer, postToServer } from "../../globals/requests";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import Select from 'react-select'
 
-// setSelectedUsers([1,5]) i have to put real time data [1,5] is static hard core data 
-
 
 const CreateTask: React.FC<{ setPage: Function; refreshTaskList:Function}> = ({setPage , refreshTaskList}) => {
+  type Landmark = { value: string };
   const [optiosUsers,setOptiosUsers] = useState([])
   const [selectedUsers,setSelectedUsers] = useState([])
   const [landmarkList,setLandmarkList] = useState([])
-
-  const handelSelectedUsers = (selected:any) =>{
-      console.log(selected)
-      const temp:any =[]
-      selected.forEach((element:any) => {
-        temp.push(element.value)
-      });
-      // console.log(temp)
-      setSelectedUsers(temp)
-  }
-  const handelSelectedLandmark = (selected:any) =>{
-      console.log(selected)
-      setFormData((prev) => {
-          return { ...prev, landmark: selected.value };
-      });
-      // console.log(temp)
-  }
+  const [landmarkData,setLandmarkData] = useState([])
+  const [districtList,setDistrictList] = useState([])
+  const [selectedLandMark,setSelectedLandMark] = useState<any[]>([])
+  const [landMarkWithUser,setLandmarkWithUser] = useState<Record<string, Landmark[]>>({});
+  const [errors, setErrors] = useState<any>({});
+  const [formData, setFormData] = useState({name:"", landmarks:"", estimate_ex_date: null as Date | null,note: "", assigned_users:[],});
 
   const getUsers = async()=> {
-      const resUsers = await getFromServer("/accounts/get-all-user");
-      if (resUsers.status){
-          // console.log(resUsers.data.results)
-          const temp:any = [];
-          resUsers.data.results.forEach((element:any) => {
-            temp.push({value:element.id,label:element.username})
+    const resUsers = await getFromServer("/task_flow/get-users-with-landmarks/");
+    if (resUsers.status){
+        const temp:any = [];
+        const LandMarkData:any = {};
+        resUsers.data.forEach((element:any) => {
+          temp.push({value:element.id,label:element.username})
+          element.landmarks.forEach((userLandmark:any) => {
+            if(!LandMarkData[userLandmark.id]){
+              LandMarkData[userLandmark.id] =[]
+            }
+            LandMarkData[userLandmark.id].push({value:element.id,label:element.username})
           });
-          setOptiosUsers(temp)
-          console.log(temp)
-          // props.setMainUsers(users)
-      }
+        });
+        setOptiosUsers(temp)
+        setThisOptionUsers(temp)
+        setLandmarkWithUser(LandMarkData)
     }
+  }
   const getLandmark = async()=> {
       const resLandmark = await getFromServer("/structure/landmarks");
       if (resLandmark.status){
-          // console.log(resLandmark.data.results)
-          // const temp:any = [];
-          // resLandmark.data.results.forEach((element:any) => {
-          //   temp.push({value:element.id,text:element.username})
-          // });
           const temp:any = [];
           resLandmark.data.results.forEach((element:any) => {
             temp.push({value:element.id,label:element.name})
           });
+          setLandmarkData(resLandmark.data.results)
           setLandmarkList(temp)
-          // props.setMainUsers(users)
       }
-    }
-  useEffect(()=>{
-    getUsers()
-    getLandmark()
-  },[])
+  }
+  const getDistricts = async()=> {
+      const resLandmark = await getFromServer("/structure/districts");
+      if (resLandmark.status){
+          const temp:any = [];
+          resLandmark.data.results.forEach((element:any) => {
+            temp.push({value:element.id,label:element.name})
+          });
+          setDistrictList(temp)
+          console.log(temp)
+      }
+  }
 
-  const [formData, setFormData] = useState({
-    name: "", // Task name
-    landmark: "", // Landmark ID (number or string, depending on input type)
-    // estimate_ex_date: "", // Expected completion date
-    estimate_ex_date: null as Date | null,
-    note: "", // Task note
-    assigned_users: [], // Array of assigned user IDs
-  });
+  const handelSelectedUsers = (selected:any) =>{
+     setSelectedUsers(selected);
+  }
+  const handelSelectedLandmark = (selected:any) =>{
+      // console.log(selected) // [{…}, {…}]
+      const tempUsers:any =[];
+      const mySet = new Set();
 
-  // useEffect(() => {
-  //   flatpickr('.form-datepicker', {
-  //     mode: 'single',
-  //     static: true,
-  //     monthSelectorType: 'static',
-  //     dateFormat: 'M j, Y',
-  //     prevArrow:
-  //       '<svg className="fill-current" width="7" height="11" viewBox="0 0 7 11"><path d="M5.4 10.8l1.4-1.4-4-4 4-4L5.4 0 0 5.4z" /></svg>',
-  //     nextArrow:
-  //       '<svg className="fill-current" width="7" height="11" viewBox="0 0 7 11"><path d="M1.4 10.8L0 9.4l4-4-4-4L1.4 0l5.4 5.4z" /></svg>',
-  //   });
-  //   }, []);
+      const tempL:any =[]
+      selected.forEach((element:any) => {
+        tempL.push(element.value)
+        const users_01:any[] = landMarkWithUser[element.value]
+        if (users_01){
+          users_01.forEach((user:any) => {
+            if(!mySet.has(user.value)){
+              mySet.add(user.value)
+              tempUsers.push(user)
+            }
+          });
+        }
+      });
 
-  const [errors, setErrors] = useState<any>({});
+      setFormData((prev) => {return { ...prev, landmarks: tempL };});
+      setSelectedUsers(tempUsers)
+      setSelectedLandMark(selected)
 
-  const validate = () => {
-    const validationErrors: any = {};
-    if (!formData.name.trim()) validationErrors.name = "Task name is required.";
-    if (!formData.landmark) validationErrors.landmark = "Landmark is required.";
-    // if (!formData.estimate_ex_date.trim())
-    //   validationErrors.estimate_ex_date = "Estimated completion date is required.";
-    if (!formData.note.trim()) validationErrors.note = "Note is required.";
-    if (!selectedUsers.length)
-      validationErrors.assigned_users = "At least one user must be assigned.";
-    return validationErrors;
+  }
+ 
+  const handelSelectedDistrict = (selected: { value: number; label: string }) => {
+    const filteredLandmarks = landmarkData
+      .filter((landmark:any) => landmark.district === selected.value) // Filter landmarks by district ID
+      .map((landmark:any) => ({ value: landmark.id, label: landmark.name })); // Transform to required format
+    console.log(filteredLandmarks);
+    handelSelectedLandmark(filteredLandmarks)
+    // return filteredLandmarks;
   };
-
-
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value, type, multiple } = e.target;
     setFormData((prev) => {
       if (type === "select-multiple" || multiple) {
-        // Handle multi-select dropdowns
         const selectedValues = Array.from((e.target as HTMLSelectElement).selectedOptions, (option) => Number(option.value));
         return { ...prev, [name]: selectedValues };
       } else if (type === "number") {
-        // Handle number fields
         return { ...prev, [name]: Number(value) };
       } else {
-        // Handle all other input types
         return { ...prev, [name]: value };
       }
     });
   };
-
-  // const fetchUsers
   
+  const validate = () => {
+    const validationErrors: any = {};
+    if (!formData.name.trim()) validationErrors.name = "Task name is required.";
+    if (!formData.landmarks) validationErrors.landmarks = "Landmark is required.";
+    if (!formData.note.trim()) validationErrors.note = "Note is required.";
+    if (!selectedUsers.length)
+      validationErrors.assigned_users = "At least one user must be assigned.";
+    return validationErrors;
+  };
 
   const handleTaskCreateSubmit = async(e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -132,7 +130,10 @@ const CreateTask: React.FC<{ setPage: Function; refreshTaskList:Function}> = ({s
     } else {
       setErrors({});
       
-      formData.assigned_users = selectedUsers
+      formData.assigned_users =[]
+      selectedUsers.forEach((element:any) => {
+        formData.assigned_users.push(element.value)
+      });
       const resTaskCreate = await postToServer("/task_flow/tasks/",formData)
       if (resTaskCreate.status==200 || resTaskCreate.status==201){
         refreshTaskList()
@@ -142,10 +143,17 @@ const CreateTask: React.FC<{ setPage: Function; refreshTaskList:Function}> = ({s
       else{
         console.log("Error Occured")
       }
+    
       // console.log("Form Data Submitted:", formData);
-      // alert(JSON.stringify(formData, null, 2)); // For demonstration purposes
+      // alert(JSON.stringify(formData, null, 2)); 
     }
   };
+
+  useEffect(()=>{
+    getUsers();
+    getLandmark();
+    getDistricts();
+  },[])
 
   return(
     <>
@@ -182,82 +190,43 @@ const CreateTask: React.FC<{ setPage: Function; refreshTaskList:Function}> = ({s
                 </label>
 
                 <div className="relative z-20 bg-transparent dark:bg-form-input">
-                  {/* <select
-                    name="landmark"
-                    value={formData.landmark}
-                    onChange={handleChange}
-                    className={`relative z-20 w-full appearance-none rounded border border-stroke bg-transparent py-3 px-5 outline-none transition focus:border-primary active:border-primary dark:border-form-strokedark dark:bg-form-input dark:focus:border-primary `
-                    //   ${isOptionSelected ? 'text-black dark:text-white' : '' }`
-                    }
-                  >
-                    <option value="" disabled className="text-body dark:text-bodydark">
-                      Select one type
-                    </option>
-                   
-                    {landmarkList.map((landmark:any, key) => (
-                      <option key={key} value={landmark.id} className="text-body dark:text-bodydark">
-                       {landmark.name}
-                      </option>
-                    ))}
-                    
-                  </select> */}
-                  <Select options={landmarkList} onChange={handelSelectedLandmark}/>
+                 
+                  <Select options={landmarkList} isMulti value={selectedLandMark} onChange={handelSelectedLandmark}/>
 
-                  {errors.landmark && <p className="text-meta-1">{errors.landmark}</p>}
-
-
-                  <span className="absolute top-1/2 right-4 z-30 -translate-y-1/2">
-                    <svg
-                      className="fill-current"
-                      width="24"
-                      height="24"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <g opacity="0.8">
-                        <path
-                          fillRule="evenodd"
-                          clipRule="evenodd"
-                          d="M5.29289 8.29289C5.68342 7.90237 6.31658 7.90237 6.70711 8.29289L12 13.5858L17.2929 8.29289C17.6834 7.90237 18.3166 7.90237 18.7071 8.29289C19.0976 8.68342 19.0976 9.31658 18.7071 9.70711L12.7071 15.7071C12.3166 16.0976 11.6834 16.0976 11.2929 15.7071L5.29289 9.70711C4.90237 9.31658 4.90237 8.68342 5.29289 8.29289Z"
-                          fill=""
-                        ></path>
-                      </g>
-                    </svg>
-                  </span>
+                  {errors.landmarks && <p className="text-meta-1">{errors.landmarks}</p>}
                 </div>
-              </div>
-
-              <div className="w-full xl:w-1/2">
-                <label className="mb-3 block text-sm font-medium text-black dark:text-white">
-                  Estimate Work Complete 
-                </label>
-                {/* <div className="relative">
-                  <input
-                    name="estimate_ex_date"
-                    value={formData.estimate_ex_date}
-                    onChange={handleChange}
-                    className="form-datepicker w-full rounded border-[1.5px] border-stroke bg-transparent px-5 py-3 font-normal outline-none transition focus:border-primary active:border-primary dark:border-form-strokedark dark:bg-form-input dark:focus:border-primary"
-                    placeholder="mm/dd/yyyy"
-                    data-class="flatpickr-right"
-                  />
-                </div> */}
-                <DatePicker
-                    selected={formData.estimate_ex_date} // Pass the selected date
-                    onChange={(date: Date) => setFormData({ ...formData, estimate_ex_date: date })} // Update state on date change
-                    showTimeSelect
-                    dateFormat="MMMM d, yyyy h:mm aa" // Customize the date & time format
-                    placeholderText="Select date and time"
-                    className="form-datepicker w-full rounded border-[1.5px] border-stroke bg-transparent px-5 py-3 font-normal outline-none transition focus:border-primary active:border-primary dark:border-form-strokedark dark:bg-form-input dark:focus:border-primary"
-                  />
-                {errors.estimate_ex_date && <p className="text-meta-1">{errors.estimate_ex_date}</p>}
               </div>
             </div>
 
             <div className="mb-4.5 flex flex-col gap-6 xl:flex-row">
               <div className="w-full xl:w-1/1">
-              <Select options={optiosUsers} isMulti onChange={handelSelectedUsers}/>
-                {/* <MultiSelect  options={optiosUsers} setOptions={setOptiosUsers} selected={selectedUsers} setSelected={setSelectedUsers} id="multiSelect"/> */}
+                  <label className="mb-3 block text-sm font-medium text-black dark:text-white">
+                    Estimate Work Complete 
+                  </label>
+                  <DatePicker
+                      selected={formData.estimate_ex_date} 
+                      onChange={(date: Date) => setFormData({ ...formData, estimate_ex_date: date })}
+                      showTimeSelect
+                      dateFormat="MMMM d, yyyy h:mm aa"
+                      placeholderText="Select date and time"
+                      className="form-datepicker w-full rounded border-[1.5px] border-stroke bg-transparent px-5 py-3 font-normal outline-none transition focus:border-primary active:border-primary dark:border-form-strokedark dark:bg-form-input dark:focus:border-primary"
+                    />
+                  {errors.estimate_ex_date && <p className="text-meta-1">{errors.estimate_ex_date}</p>}
+              </div>
+              <div className="w-full xl:w-1/2">
+                <label className="mb-2.5 block text-black dark:text-white">
+                  District <span className="text-meta-1">*</span>
+                </label>
+                <div className="relative z-20 bg-transparent dark:bg-form-input">
+                  <Select options={districtList} onChange={handelSelectedDistrict}/>
+                  {errors.landmarks && <p className="text-meta-1">{errors.landmarks}</p>}
+                </div>
+              </div>
+            </div>
+
+            <div className="mb-4.5 flex flex-col gap-6 xl:flex-row">
+              <div className="w-full xl:w-1/1">
+              <Select options={optiosUsers} value={selectedUsers} isMulti onChange={handelSelectedUsers}/>
               {errors.assigned_users && <p className="text-meta-1">{errors.assigned_users}</p>}
               </div>
             </div>
@@ -281,8 +250,6 @@ const CreateTask: React.FC<{ setPage: Function; refreshTaskList:Function}> = ({s
 
               </div>
             </div>
-
-          
 
             <button className="flex w-full justify-center rounded bg-primary p-3 font-medium text-gray hover:bg-opacity-90">
               Create Task 
