@@ -13,6 +13,12 @@ const genHeaders = () => {
     "Content-Type": "application/json",
   };
 };
+const genFormHeaders = () => {
+  return {
+    Authorization: `Bearer ${getAuthToken()}`,
+    "Content-Type": "multipart/form-data",
+  };
+};
 
 // request functions
 
@@ -72,6 +78,28 @@ const postToServer = async (url:string, data = {}) => {
     }
   }
 };
+
+
+const postToServerFileUpload = async (url:string, data = new FormData()) => {
+  try {
+    
+    const res = await axios.post(`${BASE_URL}${url}`, data, {
+      headers: genFormHeaders(),
+    });
+    return { status: res.status, data: res.data };  
+  } catch (error:any) {
+    if (error.response) {
+      return { 
+        status: error.response.status, 
+        data: error.response.data 
+      };
+    } else {
+      // General fallback when error.response is undefined
+      return { status: false, data: "An error occurred" };
+    }
+  }
+};
+
 
 const patchToServer = async (url:string, data = {}) => {
   try {
@@ -134,4 +162,4 @@ const deleteFromServer = async (url:string, data = {}) => {
   }
 };
 
-export { getFromServer, postToServer, putToServer ,deleteFromServer,patchToServer };
+export { getFromServer, postToServer, putToServer ,deleteFromServer,patchToServer,postToServerFileUpload };

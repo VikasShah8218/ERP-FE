@@ -34,7 +34,7 @@ const CreateTask: React.FC<{ setPage: Function; refreshTaskList:Function}> = ({s
           });
         });
         setOptiosUsers(temp)
-        setThisOptionUsers(temp)
+        // setThisOptionUsers(temp)
         setLandmarkWithUser(LandMarkData)
     }
   }
