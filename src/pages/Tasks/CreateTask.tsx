@@ -17,7 +17,7 @@ const CreateTask: React.FC<{ setPage: Function; refreshTaskList:Function}> = ({s
   const [selectedLandMark,setSelectedLandMark] = useState<any[]>([])
   const [landMarkWithUser,setLandmarkWithUser] = useState<Record<string, Landmark[]>>({});
   const [errors, setErrors] = useState<any>({});
-  const [formData, setFormData] = useState({name:"", landmarks:"", estimate_ex_date: null as Date | null,note: "", assigned_users:[],});
+  const [formData, setFormData] = useState({name:"", landmarks:"", estimate_ex_date: null as Date | null,note: "", assigned_users:[],latitude:"32.709240759054076",longitude:"74.8633072414406"});
 
   const getUsers = async()=> {
     const resUsers = await getFromServer("/task_flow/get-users-with-landmarks/");
@@ -134,6 +134,8 @@ const CreateTask: React.FC<{ setPage: Function; refreshTaskList:Function}> = ({s
       selectedUsers.forEach((element:any) => {
         formData.assigned_users.push(element.value)
       });
+      formData.latitude = "32.709240759054076"
+      formData.longitude = "32.709240759054076"
       const resTaskCreate = await postToServer("/task_flow/tasks/",formData)
       if (resTaskCreate.status==200 || resTaskCreate.status==201){
         refreshTaskList()

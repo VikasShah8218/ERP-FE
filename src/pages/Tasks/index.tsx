@@ -48,7 +48,7 @@ const Users :React.FC = () => {
     <>
       {page === "main" && <ShowTasks setPage={setPage} allTasksList={allTasksList} setSelectedTask={setSelectedTask} />}
       {page === "createTask" && <CreateTask setPage={setPage} refreshTaskList={getAllTaskList}/>}
-      {page === "taskDetail" && <TaskDetail setPage={setPage} refreshTaskList={getAllTaskList} selectedTask={selectedTask} optionUsers={optionUsers}/>}
+      {page === "taskDetail" && <TaskDetail setPage={setPage} refreshTaskList={getAllTaskList} selectedTask={selectedTask} optionUsers={optionUsers} setSelectedTask={setSelectedTask}/>}
     </>
   )
 };

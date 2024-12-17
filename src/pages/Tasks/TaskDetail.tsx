@@ -5,9 +5,11 @@ import Stack from '@mui/material/Stack';
 import Button from '@mui/material/Button';
 import { patchToServer ,postToServer,getFromServer,postToServerFileUpload} from "../../globals/requests";
 import Select from 'react-select'
+import PDFImage from '../../static/image/pdf.png'
+import { getCurrentLocation ,getPlaceName } from "../../utlis/locationUtils";
 
 
-const TaskDetail:React.FC<{ setPage: Function; selectedTask: any , refreshTaskList:Function, optionUsers:any }> = ({setPage,selectedTask,refreshTaskList,optionUsers}) => {
+const TaskDetail:React.FC<{ setPage: Function; selectedTask: any ,setSelectedTask:Function, refreshTaskList:Function, optionUsers:any }> = ({setPage,selectedTask,refreshTaskList,optionUsers,setSelectedTask}) => {
     const [formData, setFormData] = useState({conversation: "",});
     const [errors, setErrors] = useState<any>({});
     const [formDataRe, setFormDataRe] = useState({task:"",re_allocate_to: "", message: "."});
@@ -17,37 +19,58 @@ const TaskDetail:React.FC<{ setPage: Function; selectedTask: any , refreshTaskLi
     const [selectLandmarkComplete, setSelectLandmarkComplete] = useState<any>(Number);
     const [taskTrakeData, setTaskTrakeData] = useState<any>({});
     const [taskMedia, setTaskMedia] = useState<any>([]);
+    const [location, setLocation] = useState<{ latitude: number; longitude: number } | null>(null);
+    const [placeName, setPlaceName] = useState<string>("");
+    
 
-      const processTaskMedia = (taskMedia: any[]) => {
-        return taskMedia.map((media) => {
-          let thumbnail = media.file; 
-          if (media.file_type === "video") {
-            thumbnail = media.file.replace("task_media", "thumbnail").replace(".mp4", ".jpg");
-          } else if (media.file_type === "image" && media.file.endsWith(".jpg")) {
-            thumbnail = media.file.replace("task_media", "thumbnail");
-          } else {
-            thumbnail = "http://127.0.0.1:8000/media/default-thumbnail.jpg";
-          }
-          return {
-            ...media,
-            thumbnail,
-          };
-        });
-      };
-      const getTaskMediaFiels = async (selectedTask:any) => {
+    const processTaskMedia = (taskMedia: any[]) => {
+    return taskMedia.map((media) => {
+        let thumbnail = media.file; 
+        if (media.file_type === "video") {
+        thumbnail = media.file.replace("task_media", "thumbnail").replace(".mp4", ".jpg");
+        } else if (media.file_type === "image" && media.file.endsWith(".jpg")) {
+        thumbnail = media.file.replace("task_media", "thumbnail");
+        } else {
+        thumbnail = "http://127.0.0.1:8000/media/default-thumbnail.jpg";
+        }
+        return {
+        ...media,
+        thumbnail,
+        };
+    });
+    };
+    const getTaskMediaFiels = async (selectedTask:any) => {
         const taskMedia = await getFromServer(`/task_flow/task-media/?task_id=${selectedTask.id}`);
         // console.log(taskMedia)
         if (taskMedia.status) {
             console.log(taskMedia.data.results)
-          const processedMedia = processTaskMedia(taskMedia.data.results);
+            const processedMedia = processTaskMedia(taskMedia.data.results);
         //   console.log(processedMedia)
-          setTaskMedia(processedMedia); // Set the modified data
+            setTaskMedia(processedMedia); // Set the modified data
         console.log("*-*-*-*-*-*-*-*-*-**-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*")
         console.log(processedMedia) // Set the modified data
         console.log("*-*-*-*-*-*-*-*-*-**-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*")
         }
-      };
-      
+    };
+    const getSelectedTask = async () => {
+        const resSelectedTask = await getFromServer(`/task_flow/tasks/${selectedTask.id}`);
+        if (resSelectedTask.status) {
+            setSelectedTask(resSelectedTask.data)
+        }
+    };
+    const fetchLocationData = async () => {
+        try {
+            const currentLocation = await getCurrentLocation();
+            setLocation(currentLocation);
+            getPlaceName(currentLocation.latitude,currentLocation.longitude);
+            const name = await getPlaceName(currentLocation.latitude, currentLocation.longitude);
+            setPlaceName(name);
+            // const name = await getPlaceName(currentLocation.latitude, currentLocation.longitude);
+            // setPlaceName(name);
+        } catch (error) {
+            console.error(error);
+        }
+    };
 
     const makeLandmarkList: Function = (selectedTask: any) => {
         if (!Array.isArray(selectedTask?.landmarks)) return [];
@@ -113,8 +136,9 @@ const TaskDetail:React.FC<{ setPage: Function; selectedTask: any , refreshTaskLi
         console.log(formData)
         const response =  await patchToServer(`/task_flow/tasks/${selectedTask.id}/accept-task/`,formData);
         if (response.status === 201 || response.status === 200){
-            refreshTaskList();
-            setPage("main");
+            // refreshTaskList();
+            getSelectedTask()
+            // setPage("main");
             formData.conversation = "";
         }
     }
@@ -128,8 +152,9 @@ const TaskDetail:React.FC<{ setPage: Function; selectedTask: any , refreshTaskLi
         console.log(formData)
         const response =  await patchToServer(`/task_flow/tasks/${selectedTask.id}/add-conversation/`,formData);
         if (response.status === 201 || response.status === 200){
-            refreshTaskList();
-            setPage("main");
+            // refreshTaskList();
+            getSelectedTask()
+            // setPage("main");
             formData.conversation = "";
 
         }
@@ -145,8 +170,9 @@ const TaskDetail:React.FC<{ setPage: Function; selectedTask: any , refreshTaskLi
             console.log(formData)
             const response =  await patchToServer(`/task_flow/tasks/${selectedTask.id}/complete-task/`,formData);
             if (response.status === 201 || response.status === 200){
-                refreshTaskList();
-                setPage("main");
+                // refreshTaskList();
+                // setPage("main");
+                getSelectedTask()
                 formData.conversation = "";
             }
     }
@@ -186,12 +212,13 @@ const TaskDetail:React.FC<{ setPage: Function; selectedTask: any , refreshTaskLi
             console.log(formDataRe)
             const response =  await postToServer(`/task_flow/task-re-allocations/`,formDataRe);
             if (response.status === 201 || response.status === 200){
-                refreshTaskList();
-                setPage("main");
-                console.log(response)
+                // refreshTaskList();
+                // setPage("main");
+                getReAllocatedUser()
+                // console.log(response)
                 // formData.conversation = "";
             }
-            console.log(response)
+            // console.log(response)
     }
     }
     const handelCompleteLandMark = async () => {
@@ -226,6 +253,7 @@ const TaskDetail:React.FC<{ setPage: Function; selectedTask: any , refreshTaskLi
             if (response.status === 201 || response.status === 200){
                 refreshTaskList();
                 // setPage("main");
+                getTaskMediaFiels(selectedTask)
                 console.log(response)
             }
             // console.log(uploadFile)
@@ -247,47 +275,97 @@ const TaskDetail:React.FC<{ setPage: Function; selectedTask: any , refreshTaskLi
     const MediaGallery: React.FC<MediaGalleryProps> = ({ mediaData }) => {
         const [selectedMedia, setSelectedMedia] = useState<MediaItem | null>(null);
         const closeFullView = () => setSelectedMedia(null);
+    
         return (
-        <div className="p-4">
-            <h3 className="text-lg font-semibold mb-2">Media Gallery</h3>
-            <div className="flex space-x-2 overflow-x-auto p-2 bg-gray-800 rounded-md">
-            {mediaData.map((media) => (
-                <div key={media.id} className="min-w-[100px] h-[100px] bg-gray-700 flex items-center justify-center cursor-pointer rounded-md"
-                onClick={() => setSelectedMedia(media)}>
-                {media.file_type === "image" || media.file_type === "video" ? (
-                    <img
-                    src={media.thumbnail}
-                    alt="media-thumbnail"
-                    className="w-full h-full object-cover rounded-md"
-                    />
-                ) : (
-                    <div className="text-white">▶️</div> 
-                )}
+            <div className="p-4">
+                <h3 className="text-lg font-semibold mb-2">Media Gallery</h3>
+                <div className="flex space-x-2 overflow-x-auto p-2 bg-gray-800 rounded-md">
+                    {mediaData.map((media) => (
+                        <div
+                            key={media.id}
+                            className="min-w-[100px] h-[100px] bg-gray-700 flex items-center justify-center cursor-pointer rounded-md hover:scale-105 transition-transform duration-300"
+                            onClick={() => setSelectedMedia(media)}
+                        >
+                            {media.file_type === "image" || media.file_type === "video" ? (
+                                <img
+                                    src={media.thumbnail}
+                                    alt="media-thumbnail"
+                                    className="w-full h-full object-cover rounded-md"
+                                />
+                            ) : media.file_type === "pdf" ? (
+                                <div className="flex flex-col items-center justify-center text-white">
+                                    <img src={PDFImage} alt="PDF Icon" className="w-20 h-20 object-contain mb-2"/>
+                                </div>
+                            ) : (
+                                <div className="text-white">❓</div>
+                            )}
+                        </div>
+                    ))}
                 </div>
-            ))}
+                {selectedMedia && (
+                    <div
+                        className="fixed top-0 left-0 w-full h-full bg-black bg-opacity-90 flex items-center justify-center z-50"
+                    >
+                        <div className="max-w-[80%] max-h-[80%] bg-white rounded-md overflow-hidden relative">
+                            <button
+                                onClick={closeFullView}
+                                style={{zIndex:"9999"}}
+                                className="absolute top-2 right-2 text-black bg-gray-200 hover:bg-gray-300 rounded-full w-8 h-8 flex items-center justify-center"
+                            >
+                                ✖️
+                            </button>
+                            {selectedMedia.file_type === "image" ? (
+                                <div style={{maxWidth:"600px"}} >
+                                    <img src={selectedMedia.file}  alt="full-view" className="w-full h-auto object-contain"/>
+                                </div>
+                            ) : selectedMedia.file_type === "video" ? (
+                                <div style={{maxWidth:"700px"}} >
+                                    <video src={selectedMedia.file} controls className="w-full h-auto object-contain" />
+                                </div>
+                            ) : selectedMedia.file_type === "pdf" ? (
+                                <div style={{backgroundColor:"black"}} className="flex flex-col items-center justify-center p-4">
+                                <a
+                                    href={selectedMedia.file}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="flex flex-col items-center hover:scale-105 transition-transform duration-300"
+                                >
+                                    <img
+                                        src={PDFImage}
+                                        style={{width:"200px",height:"200px",backgroundColor:"black"}}
+                                        alt="PDF Icon"
+                                        className="w-20 h-20 object-contain mb-2"
+                                    />
+                                    {/* <span className="text-gray-100 font-medium">Open PDF</span> */}
+                                </a>
+                            </div>
+                            ) : (
+                                <div className="text-center text-gray-700 p-4">
+                                    Unsupported file type
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                )}
             </div>
-            {selectedMedia && (
-            <div onClick={closeFullView} className="fixed top-0 left-30 w-full h-full bg-black bg-opacity-90 flex items-center justify-center z-50">
-                {selectedMedia.file_type === "image" ? 
-                (<img src={selectedMedia.file} alt="full-view" className="max-w-full max-h-full rounded-md" />) : 
-                (<video src={selectedMedia.file} controls className="max-w-full max-h-full rounded-md"/>)}
-            </div>
-            )}
-        </div>
         );
     };
-  
+    
 
     useEffect(()=>{
         getReAllocatedUser();
         makeLandmarkList(selectedTask);
         taskTrace(selectedTask);
         getTaskMediaFiels(selectedTask);
+        fetchLocationData();
+
     },[])
 
     const normalizedDate = format(new Date(selectedTask.estimate_ex_date), "MMMM d, yyyy h:mm a");
     return(
         <>
+          { location?<>{location.latitude} {location.longitude}</> : "None" }
+          {placeName?placeName:"None"}
             <div onClick={()=>{setPage("main")}} > <FontAwesomeIcon icon="fa-solid fa-angle-left" /> </div> 
 
             <div className="flex p-5 bg-[#1E293B] shadow-md rounded-lg text-white">
@@ -352,7 +430,7 @@ const TaskDetail:React.FC<{ setPage: Function; selectedTask: any , refreshTaskLi
             <div className="rounded-sm mt-2 border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
                 <div className="border-b border-stroke py-4 px-6.5 dark:border-strokedark">
                     <h3 className="font-medium text-black dark:text-white">
-                    Note for this Task
+                    Maqsad
                     </h3>
                 </div>
                 <div className="flex flex-col gap-5.5 p-6.5">
