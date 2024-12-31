@@ -1,10 +1,13 @@
 import React, { useState } from "react";
 import { useEffect } from "react";
-// import { postToServer } from "../../globals/requests";
 import { getFromServer, postToServer } from "../../globals/requests";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import Select from 'react-select'
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faAngleLeft } from '@fortawesome/free-solid-svg-icons';
+
+
 
 
 const CreateTask: React.FC<{ setPage: Function; refreshTaskList:Function}> = ({setPage , refreshTaskList}) => {
@@ -88,15 +91,19 @@ const CreateTask: React.FC<{ setPage: Function; refreshTaskList:Function}> = ({s
       setSelectedLandMark(selected)
 
   }
- 
-  const handelSelectedDistrict = (selected: { value: number; label: string }) => {
-    const filteredLandmarks = landmarkData
-      .filter((landmark:any) => landmark.district === selected.value) // Filter landmarks by district ID
-      .map((landmark:any) => ({ value: landmark.id, label: landmark.name })); // Transform to required format
-    console.log(filteredLandmarks);
-    handelSelectedLandmark(filteredLandmarks)
-    // return filteredLandmarks;
+  const handelSelectedDistrict = (selected: { value: number; label: string }[]) => {
+    let allFilteredLandmarks: { value: number; label: string }[] = [];
+  
+    selected.forEach((item) => {
+      const filteredLandmarks = landmarkData
+        .filter((landmark: any) => landmark.district === item.value) 
+        .map((landmark: any) => ({ value: landmark.id, label: landmark.name })); 
+      allFilteredLandmarks = [...allFilteredLandmarks, ...filteredLandmarks];
+    });
+    console.log(allFilteredLandmarks); 
+    handelSelectedLandmark(allFilteredLandmarks);
   };
+
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value, type, multiple } = e.target;
@@ -159,6 +166,7 @@ const CreateTask: React.FC<{ setPage: Function; refreshTaskList:Function}> = ({s
 
   return(
     <>
+    <div onClick={()=>{setPage("main")}} > <FontAwesomeIcon icon={faAngleLeft} /> </div> 
     <div className="flex flex-col gap-9">
       {/* <!-- Contact Form --> */}
       <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
@@ -220,7 +228,7 @@ const CreateTask: React.FC<{ setPage: Function; refreshTaskList:Function}> = ({s
                   District <span className="text-meta-1">*</span>
                 </label>
                 <div className="relative z-20 bg-transparent dark:bg-form-input">
-                  <Select options={districtList} onChange={handelSelectedDistrict}/>
+                  <Select options={districtList} isMulti  onChange={handelSelectedDistrict}/>
                   {errors.landmarks && <p className="text-meta-1">{errors.landmarks}</p>}
                 </div>
               </div>

@@ -1,5 +1,5 @@
 import { toast } from "react-toastify";
-import { playErrorSound, playNotiSound,playMsgSound } from "./sounds";
+// import { playErrorSound, playNotiSound,playMsgSound } from "./sounds";
 
 const showStatusSoundToast = (
   status = false,
@@ -7,25 +7,25 @@ const showStatusSoundToast = (
 ) => {
   if (status) {
     toast.success(text);
-    playNotiSound();
+    // playNotiSound();
   } else {
     toast.error(text);
-    playErrorSound();
+    // playErrorSound();
   }
 };
 
 const showErrorAlert = (text = "") => {
   toast.error(text);
-  playErrorSound();
+  // playErrorSound();
 };
 const showSuccessSoundToast = (text = "") => {
   toast.success(text);
-  playNotiSound();
+  // playNotiSound();
 };
 
 const showMessages = (text= "Message") => {
   toast.info(text)
-  playMsgSound();
+  // playMsgSound();
 
 }
 

@@ -1,7 +1,7 @@
 import { Howl } from "howler";
-import notiWav from "../assets/sounds/noti.wav";
-import errorWav from "../assets/sounds/error.wav";
-import msgWav from "../assets/sounds/msg.wav";
+import notiWav from "../../src/globals/sounds/noti.wav";
+import errorWav from "./sounds/error.wav";
+import msgWav from "./sounds/msg.wav";
 
 const notiSound = new Howl({src: [notiWav]});
 const errorSound = new Howl({src: [errorWav]});

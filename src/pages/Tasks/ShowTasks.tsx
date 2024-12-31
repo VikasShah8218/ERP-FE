@@ -21,7 +21,7 @@ const ShowTasks : React.FC<{ setPage: Function; allTasksList: any , setSelectedT
                     Landmark
                 </th>
                 <th className="min-w-[120px] py-4 px-4 font-medium text-black dark:text-white">
-                    Estimate date
+                    Type
                 </th>
                 <th className="min-w-[120px] py-4 px-4 font-medium text-black dark:text-white">
                     Status
@@ -41,10 +41,7 @@ const ShowTasks : React.FC<{ setPage: Function; allTasksList: any , setSelectedT
                     <h5 className="font-medium text-black dark:text-white">
                         {task.name}
                     </h5>
-                    <p className="text-sm">10</p>
-                    {/* <div className="h-12.5 w-15 rounded-md">
-                        <img src={`data:image/png;base64,${task.image}`} alt="task" />
-                    </div> */}
+                    {/* <p className="text-sm">10</p> */}
                     </td>
                     <td className="border-b border-[#eee] py-5 px-4 dark:border-strokedark">
                     <p className="text-black dark:text-white">
@@ -52,9 +49,24 @@ const ShowTasks : React.FC<{ setPage: Function; allTasksList: any , setSelectedT
                     </p>
                     </td>
                     <td className="border-b border-[#eee] py-5 px-4 dark:border-strokedark">
-                    <p className="text-black dark:text-white">
-                        {task.estimate_ex_date}
-                    </p>
+                        <p className="text-black dark:text-white">
+                            {/* {task.estimate_ex_date} */}
+                            <p
+                                className={`inline-flex rounded-full bg-opacity-10 py-1 px-3 text-sm font-medium ${
+                                    task.scheduled
+                                        ? "bg-danger text-danger" 
+                                        : task.is_private
+                                        ? "bg-warning text-warning"
+                                        : "bg-success text-success" 
+                                }`}
+                            >
+                                {task.scheduled
+                                    ? "Scheduled" 
+                                    : task.is_private
+                                    ? "Private"
+                                    : "Public"}
+                            </p>
+                        </p>
                     </td>
                     
                     <td className="border-b border-[#eee] py-5 px-4 dark:border-strokedark">

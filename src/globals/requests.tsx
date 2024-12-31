@@ -9,13 +9,13 @@ const ERROR_MSG = { type: "error", text: "Something went wrong." };
 // helpers functions
 const genHeaders = () => {
   return {
-    Authorization: `Bearer ${getAuthToken()}`,
+    Authorization: `Token ${getAuthToken()}`,
     "Content-Type": "application/json",
   };
 };
 const genFormHeaders = () => {
   return {
-    Authorization: `Bearer ${getAuthToken()}`,
+    Authorization: `Token ${getAuthToken()}`,
     "Content-Type": "multipart/form-data",
   };
 };

@@ -5,10 +5,11 @@ import { getFromServer } from '../../globals/requests';
 import { useEffect, useState } from 'react';
 import CreateTask from "./CreateTask";
 import TaskDetail from "./TaskDetail";
+import { useSelector } from "react-redux";
 
 const Users :React.FC = () => {
     
-    // const [page, setPage] = useState(true)
+    const userId = useSelector((state:any) => state.auth.user.id);
     const [page, setPage] = useState<"main" | "createTask" | "taskDetail">("main");
     const [allTasksList,setAllTasksList] = useState([])
     const [selectedTask,setSelectedTask] = useState({})
@@ -27,13 +28,15 @@ const Users :React.FC = () => {
           const temp:any = [];
           const LandMarkData:any = {};
           resUsers.data.forEach((element:any) => {
-            temp.push({value:element.id,label:element.username})
-            element.landmarks.forEach((userLandmark:any) => {
-              if(!LandMarkData[userLandmark.id]){
-                LandMarkData[userLandmark.id] =[]
-              }
-              LandMarkData[userLandmark.id].push({value:element.id,label:element.username})
-            });
+            if ( element.id !== userId  ){
+              temp.push({value:element.id,label:element.username})
+              element.landmarks.forEach((userLandmark:any) => {
+                  if(!LandMarkData[userLandmark.id]){
+                    LandMarkData[userLandmark.id] =[]
+                  }
+                  LandMarkData[userLandmark.id].push({value:element.id,label:element.username})
+              });
+            }
           });
           setOptionUsers(temp)
       }
@@ -48,7 +51,7 @@ const Users :React.FC = () => {
     <>
       {page === "main" && <ShowTasks setPage={setPage} allTasksList={allTasksList} setSelectedTask={setSelectedTask} />}
       {page === "createTask" && <CreateTask setPage={setPage} refreshTaskList={getAllTaskList}/>}
-      {page === "taskDetail" && <TaskDetail setPage={setPage} refreshTaskList={getAllTaskList} selectedTask={selectedTask} optionUsers={optionUsers} setSelectedTask={setSelectedTask}/>}
+      {page === "taskDetail" && <TaskDetail setPage={setPage} refreshTaskList={getAllTaskList} selectedTask={selectedTask} optionUsers={optionUsers} setSelectedTask={setSelectedTask} setOptionUsers={setOptionUsers}/>}
     </>
   )
 };
