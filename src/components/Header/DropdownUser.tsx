@@ -1,40 +1,52 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import ClickOutside from '../ClickOutside';
-import UserOne from '../../images/user/user-01.png';
+// import UserOne from '../../images/user/user-01.png';
 import { postToServer } from '../../globals/requests';
-import { useDispatch } from "react-redux";
+import { useDispatch ,useSelector} from "react-redux";
 import { logout } from "../../app/slices/authSlice";
+import UserImage from "../../static/image/user.png"
 
 
 
 const DropdownUser = () => {
   const dispatch = useDispatch();
+  // const [loggedInUser,setLoggedInUser] = useState<any>({})
+  const loggedInUser =  useSelector((state:any) => state.auth.user)
 
   const logoutHandle = async () => {
     const response = await postToServer("/accounts/logout/",{"refresh": localStorage.getItem("auth_token")});
-    dispatch(logout())
+      dispatch(logout())
+  }
 
-    }
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  useEffect(()=>{
+    // setLoggedInUser();
+    console.log(loggedInUser)
+  },[])
 
   return (
     <ClickOutside onClick={() => setDropdownOpen(false)} className="relative">
-      <Link
-        onClick={() => setDropdownOpen(!dropdownOpen)}
-        className="flex items-center gap-4"
-        to="#"
-      >
+      <Link onClick={() => setDropdownOpen(!dropdownOpen)} className="flex items-center gap-4" to="#">
         <span className="hidden text-right lg:block">
           <span className="block text-sm font-medium text-black dark:text-white">
-            Thomas Anree
+            {loggedInUser && <>{loggedInUser.first_name}</>}
           </span>
-          <span className="block text-xs">UX Designer</span>
+          <span className="block text-xs">  {loggedInUser && <>{loggedInUser.last_name}</>}</span>
         </span>
 
         <span className="h-12 w-12 rounded-full">
-          <img src={UserOne} alt="User" />
+          <img
+            src={
+              loggedInUser.image
+                ? `data:image/jpeg;base64,${loggedInUser.image}`
+                : UserImage
+            }
+            alt="User"
+            className="h-full w-full rounded-full object-cover"
+          />
         </span>
+
 
         <svg
           className="hidden fill-current sm:block"
@@ -152,7 +164,7 @@ const DropdownUser = () => {
             Log Out
           </button>
         </div>
-      )}
+      )}  
       {/* <!-- Dropdown End --> */}
     </ClickOutside>
   );

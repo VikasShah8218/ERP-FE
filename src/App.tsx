@@ -59,19 +59,16 @@ function App() {
     <Loader />
   ) : (
     isAuthPage ? (
+      <>
       <Routes>
-        <Route
-          path="/auth/signin"
-          element={
+        <Route path="/auth/signin" element={
             <>
               <PageTitle title="Signin | TailAdmin - Tailwind CSS Admin Dashboard Template" />
               <SignIn />
             </>
           }
         />
-        <Route
-          path="/auth/signup"
-          element={
+        <Route path="/auth/signup" element={
             <>
               <PageTitle title="Signup | TailAdmin - Tailwind CSS Admin Dashboard Template" />
               <SignUp />
@@ -79,6 +76,8 @@ function App() {
           }
         />
       </Routes>
+      <ToastContainer position="bottom-right" autoClose={10000} theme="colored" />
+      </>
     ) : (
       <DefaultLayout>
         <Routes>

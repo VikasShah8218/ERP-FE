@@ -1,13 +1,13 @@
 import React, { useRef } from "react";
 import { Link } from 'react-router-dom';
-import Breadcrumb from '../../components/Breadcrumbs/Breadcrumb';
 import LogoDark from '../../images/logo/logo-dark.svg';
 import Logo from '../../images/logo/logo.svg';
 import { useDispatch } from "react-redux";
-// import { postToServer } from "../../../globals/requests";
-import { postToServer } from "../../globals/requests";
+import { BASE_URL } from "../../globals/requests";
+import axios from 'axios';
 import { login } from "../../app/slices/authSlice";
 import { useNavigate } from 'react-router-dom';
+import { showMessages , showErrorAlert} from '../../globals/messages';
 
 
 
@@ -19,7 +19,22 @@ const SignIn: React.FC = () => {
     username: useRef<HTMLInputElement>(null),
     password: useRef<HTMLInputElement>(null),
   };
-  
+  const postToServer = async (url:string, data = {}) => {
+    try {
+      const res = await axios.post(`${BASE_URL}${url}`, data, {
+      });
+      return { status: res.status, data: res.data };  
+    } catch (error:any) {
+      if (error.response) {
+        return { 
+          status: error.response.status, 
+          data: error.response.data 
+        };
+      } else {
+        return { status: false, data: "An error occurred" };
+      }
+    }
+  };
 
   const submitLogin = async (e: any) => {
     e.preventDefault();
@@ -33,10 +48,12 @@ const SignIn: React.FC = () => {
     }
     if (!reqData) return false;
     const result = await postToServer("/accounts/login/", reqData);
-    if (result.status) {
+    if (result.status===200 || result.status===201 ) {
+      showMessages("Logged In")
       dispatch(login(result.data));
       navigate('/');
     }
+    else{showErrorAlert(result.data.error)}
   };
 
 

@@ -8,10 +8,10 @@ import Select from 'react-select'
 import PDFImage from '../../static/image/pdf.png'
 import { getCurrentLocation ,getPlaceName } from "../../utlis/locationUtils";
 import { showMessages , showErrorAlert} from '../../globals/messages';
-import { faCloudArrowUp,faPlus,faAngleLeft } from '@fortawesome/free-solid-svg-icons';
+import { faCloudArrowUp,faPlus,faAngleLeft,faPaperPlane,faCheck} from '@fortawesome/free-solid-svg-icons';
 
 
-const TaskDetail:React.FC<{ setPage: Function; selectedTask: any ,setSelectedTask:Function, refreshTaskList:Function, optionUsers:any ,setOptionUsers:Function}> = ({setPage,selectedTask,refreshTaskList,optionUsers,setSelectedTask,setOptionUsers}) => {
+const TaskDetail:React.FC<{ setPage: Function; selectedTask: any ,setSelectedTask:Function, refreshTaskList:Function, optionUsers:any ,setOptionUsers:Function}> = ({setPage,selectedTask,refreshTaskList,optionUsers,setSelectedTask}) => {
     
     const [location, setLocation] = useState<{ latitude: number; longitude: number } | null>(null);
     const normalizedDate = format(new Date(selectedTask.estimate_ex_date), "MMMM d, yyyy h:mm a");
@@ -25,13 +25,54 @@ const TaskDetail:React.FC<{ setPage: Function; selectedTask: any ,setSelectedTas
     const [addUserForm, setAddUserForm] = useState<any>({})
     const [placeName, setPlaceName] = useState<string>("");
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isRemoveModalOpen, setIsRemoveModalOpen] = useState(false);
     const [taskMedia, setTaskMedia] = useState<any>([]);
+    const [selectedRemoveUser, setSelectedRemoveUser] = useState<any>();
     const [errors, setErrors] = useState<any>({});
     const fileRef = useRef(null);
 
     interface MediaItem {id: number; file_type: string; file: string; thumbnail: string; }
     interface MediaGalleryProps {mediaData: MediaItem[];}
 
+    const customStyles = {
+        control: (provided: any, state: any) => ({
+            ...provided,
+            backgroundColor: '#1E293B', // Dark background
+            borderColor: state.isFocused ? '#0EA5E9' : '#334155', // Highlighted border on focus
+            color: '#FFFFFF', // Text color
+            boxShadow: state.isFocused ? '0 0 0 2px rgba(14, 165, 233, 0.5)' : undefined,
+            '&:hover': {
+                borderColor: '#0EA5E9', // Hover border color
+            },
+        }),
+        singleValue: (provided: any) => ({
+            ...provided,
+            color: '#FFFFFF', // Text color for selected option
+        }),
+        menu: (provided: any) => ({
+            ...provided,
+            backgroundColor: '#1E293B', // Menu background color
+            border: '1px solid #334155',
+            zIndex: 10, // Ensure it appears above other elements
+        }),
+        option: (provided: any, state: any) => ({
+            ...provided,
+            backgroundColor: state.isFocused ? '#0EA5E9' : '#1E293B', // Highlighted option
+            color: '#FFFFFF',
+            cursor: 'pointer',
+            '&:hover': {
+                backgroundColor: '#0EA5E9',
+            },
+        }),
+        placeholder: (provided: any) => ({
+            ...provided,
+            color: '#94A3B8', // Placeholder color
+        }),
+        input: (provided: any) => ({
+            ...provided,
+            color: '#FFFFFF', // Ensure text color in the input field is white
+        }),
+    };
     const processTaskMedia = (taskMedia: any[]) => {
     return taskMedia.map((media) => {
         let thumbnail = media.file; 
@@ -231,11 +272,12 @@ const TaskDetail:React.FC<{ setPage: Function; selectedTask: any ,setSelectedTas
             }
     }
     }
-    const filterUserList = () => {
+    useEffect(()=>{
         const selectedUserIds = selectedTask.assigned_users.map((user:any) => user.id);
         const userList = optionUsers.filter((option:any) => !selectedUserIds.includes(option.value));
         setAddUserList(userList)
-    };
+    },[selectedTask])
+    
     const handelSelectedAddUser = (selected:any) => {
         const tempL:any =[]
         selected.forEach((element:any) => {
@@ -261,10 +303,39 @@ const TaskDetail:React.FC<{ setPage: Function; selectedTask: any ,setSelectedTas
         setErrors({})
         setAddUserForm({});
         setIsModalOpen(false); 
-        filterUserList()
+        // filterUserList()
         }
     }
-  
+    const handelRemoveUser = async() => {
+        if(!selectedRemoveUser){
+            setErrors({addNewUser:"Please Select atleast One Employee"});
+            return null;
+        }
+        else{
+            let data: { remove_users: number[] } = { remove_users: [] };
+            const temp: number[] = []; 
+            temp.push(selectedRemoveUser.id);
+            data.remove_users = temp;
+
+            const response = await patchToServer(`/task_flow/tasks/${selectedTask.id}/update-users/`,data);
+            if (response.status === 201 || response.status === 200){
+                getSelectedTask()
+                showMessages(response.data.detail);
+            }
+            else{
+                showErrorAlert(response.data.detail);
+            }
+        setErrors({})
+        setAddUserForm({});
+        setIsRemoveModalOpen(false); 
+        // filterUserList()
+        }
+    }
+    const OpenRemoveUserModel = (user:any) => {
+        setIsRemoveModalOpen(true)
+        setSelectedRemoveUser(user)
+    }
+
     const MediaGallery: React.FC<MediaGalleryProps> = ({ mediaData }) => {
         const openFile = () => {fileRef.current.click();}
         const [selectedMedia, setSelectedMedia] = useState<MediaItem | null>(null);
@@ -356,7 +427,7 @@ const TaskDetail:React.FC<{ setPage: Function; selectedTask: any ,setSelectedTas
         taskTrace(selectedTask);
         getTaskMediaFiels(selectedTask);
         fetchLocationData();
-        filterUserList()
+        // filterUserList()
         
     },[])
 
@@ -366,63 +437,74 @@ const TaskDetail:React.FC<{ setPage: Function; selectedTask: any ,setSelectedTas
           {placeName?placeName:"None"}
             <div onClick={()=>{setPage("main")}} > <FontAwesomeIcon icon={faAngleLeft} /> </div> 
 
-            <div className="flex p-5 bg-[#1E293B] shadow-md rounded-lg text-white">
-                <h1 className="text-xl font-semibold mb-2">
-                    Task Name: <span className="text-[#0EA5E9]">{selectedTask.name}</span>
-                </h1>
-                <h1 className="ml-4 text-xl font-semibold flex items-center">
-                    {/* Status :  {"  "} */}
-                    <span  className={`inline-flex rounded-full ml-2 bg-opacity-10 py-1 px-3 text-sm font-medium ${
-                    selectedTask.is_complete
-                        ? "bg-success text-success"
-                        : selectedTask.is_started
-                        ? "bg-warning text-warning"
-                        : "bg-danger text-danger"
-                    }`}
-                    >
-                    {selectedTask.is_complete
-                    ? " Completed"
-                    : selectedTask.is_started
-                    ? " Active"
-                    : " Pending"}
-                    </span>
-                </h1>
-                <h1 className="ml-4 text-xl font-semibold mb-2">
-                <span className="text-[#0EA5E9]"> {selectedTask.landmarks? (selectedTask.landmarks[0].name?selectedTask.landmarks[0].name:"NULL"):"NULL"}</span>
-                </h1>
-                <h1 className="text-xl ml-4 font-semibold mb-2 text-[#AA203B]">
-                    {normalizedDate}
-                </h1>
-                <div>
-                    {taskTrakeData && taskTrakeData.totalLandmarks ? (
-                        <div className="p-4  rounded-md ">
-                        <div className="flex  gap-2">
-                            <div className="mr-1 text-gray-600 dark:text-gray-300">
-                            <span className="font-medium"><FontAwesomeIcon icon="fa-solid fa-building-flag" /></span> {taskTrakeData.totalLandmarks}
-                            </div>
-                            <div className="mr-1 text-gray-600 dark:text-gray-300">
-                            <span className="font-medium"><FontAwesomeIcon icon="fa-solid fa-spinner" /> </span> {taskTrakeData.landmarksnotComplete}
-                            </div>
-                            <div className="mr-1 text-gray-600 dark:text-green-300">
-                            <span className="font-medium"><FontAwesomeIcon icon="fa-solid fa-check" /></span> {taskTrakeData.taskComplete}
-                            </div>
-                        </div>
-                        </div>
-                    ) : (
-                        <div className="p-4 bg-red-100 text-red-600 rounded-md shadow-md dark:bg-red-800 dark:text-red-300">
-                        Task data is not available.
-                        </div>
-                    )}
-                </div>
+            <div className="flex flex-wrap items-center justify-between p-4 bg-gray-800 shadow-md rounded-lg text-white">
+            {/* Task Name */}
+            <h1 className="text-base font-semibold">
+                Task Name: <span className="text-blue-400">{selectedTask.name}</span>
+            </h1>
 
+            {/* Task Status */}
+            <h1 className="text-base font-semibold flex items-center">
+                <span
+                className={`inline-flex rounded-full bg-opacity-10 py-1 px-2 text-xs font-medium ${
+                    selectedTask.is_complete
+                    ? "bg-green-500 text-green-500"
+                    : selectedTask.is_started
+                    ? "bg-yellow-500 text-yellow-500"
+                    : "bg-red-500 text-red-500"
+                }`}
+                >
+                {selectedTask.is_complete
+                    ? "Completed"
+                    : selectedTask.is_started
+                    ? "Active"
+                    : "Pending"}
+                </span>
+            </h1>
+
+            {/* Landmark */}
+            <h1 className="text-base font-semibold">
+                <span className="text-blue-400">
+                {selectedTask.landmarks
+                    ? selectedTask.landmarks[0]?.name || "NULL"
+                    : "NULL"}
+                </span>
+            </h1>
+
+            {/* Date */}
+            <h1 className="text-base font-semibold text-red-400">{normalizedDate}</h1>
+
+            {/* Task Tracking Data */}
+            <div className="mt-2 w-full">
+                {taskTrakeData && taskTrakeData.totalLandmarks ? (
+                <div className="flex gap-3 text-sm">
+                    <div className="text-gray-300 flex items-center gap-1">
+                    <FontAwesomeIcon icon="fa-solid fa-building-flag" />{" "}
+                    {taskTrakeData.totalLandmarks}
+                    </div>
+                    <div className="text-gray-300 flex items-center gap-1">
+                    <FontAwesomeIcon icon="fa-solid fa-spinner" />{" "}
+                    {taskTrakeData.landmarksnotComplete}
+                    </div>
+                    <div className="text-green-400 flex items-center gap-1">
+                    <FontAwesomeIcon icon="fa-solid fa-check" />{" "}
+                    {taskTrakeData.taskComplete}
+                    </div>
+                </div>
+                ) : (
+                <div className="p-3 bg-red-100 text-red-600 rounded-md text-center text-sm shadow-md dark:bg-red-800 dark:text-red-300">
+                    Task data is not available.
+                </div>
+                )}
             </div>
-                        
+            </div>
+
             <div className="flex mt-2 gap-2 overflow-x-auto">
-                <div title="Add User"  onClick={()=>{ setIsModalOpen(true) }} className="bg-blue-900 font-semibold text-white px-3 py-1 rounded-md text-sm shadow-md whitespace-nowrap">
+                <div title="Add User"  onClick={()=>{ setIsModalOpen(true) }} className="bg-blue-900 cursor-pointer hover:bg-blue-500 font-semibold text-white px-3 py-1 rounded-md text-sm shadow-md whitespace-nowrap">
                     <FontAwesomeIcon icon={faPlus} />
                 </div>
                 {selectedTask.assigned_users.map((user:any) => (
-                    <div key={user.id} className="bg-blue-900 font-semibold text-white px-3 py-1 rounded-md text-sm shadow-md whitespace-nowrap">
+                    <div key={user.id} onClick={()=>{OpenRemoveUserModel(user)}} className="bg-blue-900 cursor-pointer hover:bg-blue-500 font-semibold text-white px-3 py-1 rounded-md text-sm shadow-md whitespace-nowrap">
                         {user.first_name}
                     </div>
                 ))}
@@ -487,69 +569,72 @@ const TaskDetail:React.FC<{ setPage: Function; selectedTask: any ,setSelectedTas
                     placeholder="Add Message here"
                     className="w-full rounded-lg border-[1.5px] border-primary bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:bg-form-input dark:text-white"
                     ></textarea>
-                    <button
-                        type="button"
-                        onClick={handelMessage}
-                        className="absolute right-3 top-1/2 transform -translate-y-1/2 bg-primary text-white rounded-lg px-4 py-2 text-sm hover:bg-primary-dark transition">
-                        Send
+                    <button type="button" onClick={handelMessage} disabled={!selectedTask.is_started || selectedTask.is_complete} className={`absolute right-3 top-1/2 transform -translate-y-1/2 rounded-lg px-4 py-2 text-sm transition ${!selectedTask.is_started || selectedTask.is_complete ? "bg-gray-400 text-gray-200 cursor-not-allowed" : "bg-primary text-white hover:bg-primary-dark"}`}> 
+                        <FontAwesomeIcon icon={faPaperPlane} />
                     </button>
                 </div>
                 {errors.conversation && <p className="text-meta-1">{errors.conversation}</p>}
             </div>
 
-            <div className="flex mt-2">
-                <div className="w-full  mr-3  xl:w-1/3">
-                    <label className="mb-2.5 block text-black dark:text-white">
-                        Reallocate To <span className="text-meta-1">*</span>
+            {/* <div className="flex flex-wrap gap-4 mt-2"> */}
+            <div className="gap-4 mt-2 flex flex-col lg:flex-row">
+
+                {/* Reallocate To */}
+                <div className="flex w-full lg:w-1/2 items-center lg:flex-row flex-col z-2">
+                    <div className="flex-grow w-full lg:w-auto">
+                    <label className="mb-1 block text-sm font-medium text-black dark:text-white">
+                        Reallocate To <span className="text-red-500">*</span>
                     </label>
                     <div className="relative z-20 bg-transparent dark:bg-form-input">
-                        <Select options={optionUsers} onChange={handelselectedUser1}/>
-                        {errors.re_allocate_to && <p className="text-meta-1">{errors.re_allocate_to}</p>}
+                        <div style={{display:"flex"}}>
+                            <div style={{width:"100%"}}>
+                                <Select options={optionUsers} styles={customStyles} onChange={handelselectedUser1} />
+                            </div>
+                            <button type="button" onClick={handelReallocate} disabled={!selectedTask.is_started || selectedTask.is_complete} className={`ml-0 lg:ml-2 lg:mt-0 rounded-lg px-4 py-2 text-sm transition ${!selectedTask.is_started || selectedTask.is_complete ? "bg-gray-400 text-gray-200 cursor-not-allowed": "bg-primary text-white hover:bg-primary-dark"}`}>
+                                <FontAwesomeIcon icon={faCheck} />
+                            </button>
+                        </div>
+                        {errors.re_allocate_to && <p className="mt-1 text-sm text-red-500">{errors.re_allocate_to}</p>}
+                    </div>
                     </div>
                 </div>
-                <div className="w-full  mr-3  xl:w-1/3">
-                    <label className="mb-2.5 block text-black dark:text-white">
-                        Select Completed Landmark <span className="text-meta-1">*</span>
+
+                {/* Select Completed Landmark */}
+                <div className="flex w-full lg:w-1/2 items-center lg:flex-row flex-col z-1">
+                    <div className="flex-grow w-full lg:w-auto">
+                    <label className="mb-1 block text-sm font-medium text-black dark:text-white">
+                        Select Completed Landmark <span className="text-red-500">*</span>
                     </label>
                     <div className="relative z-20 bg-transparent dark:bg-form-input">
-                        <Select options={assosiatedLandmakrs} onChange={handelSelectLandmarktoComplete}/>
-                        {errors.completeLandMark && <p className="text-meta-1">{errors.completeLandMark}</p>}
+                    <div style={{display:"flex"}}>
+                        <div style={{width:"100%"}}>
+                            <Select options={assosiatedLandmakrs} styles={customStyles} onChange={handelSelectLandmarktoComplete} />
+                        </div>
+                        <button type="button" onClick={handelCompleteLandMark} disabled={!selectedTask.is_started || selectedTask.is_complete}  className={`ml-0 lg:ml-2 lg:mt-0 rounded-lg px-4 py-2 text-sm transition ${!selectedTask.is_started || selectedTask.is_complete ? "bg-gray-400 text-gray-200 cursor-not-allowed" : "bg-primary text-white hover:bg-primary-dark"}`}>
+                            <FontAwesomeIcon icon={faCheck} />
+                        </button>
+                    </div>
+                        {errors.completeLandMark && <p className="mt-1 text-sm text-red-500">{errors.completeLandMark}</p>}
+                    </div>
                     </div>
                 </div>
-                {/* <div className="flex  gap-5.5 p-5.5  xl:w-1/3">
-                    <div>
-                        <input type="file"  name="file" onChange={handelFileChange} className="w-full cursor-pointer rounded-lg border-[1.5px] border-stroke bg-transparent outline-none transition file:mr-5 file:border-collapse file:cursor-pointer file:border-0 file:border-r file:border-solid file:border-stroke file:bg-whiter file:py-3 file:px-5 file:hover:bg-primary file:hover:bg-opacity-10 focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:file:border-form-strokedark dark:file:bg-white/30 dark:file:text-white dark:focus:border-primary"/>
-                        {errors.file && <p className="text-meta-1">{errors.file}</p>}
-                        {errors.task && <p className="text-meta-1">{errors.task}</p>}
-                    </div>
-                </div> */}
             </div>
 
             <div className="mt-5">
                 <Stack spacing={2} direction="row">
-                    {/* <Button onClick={handelMessage} className="mr-4" variant="contained" disabled={!selectedTask.is_started || selectedTask.is_complete}>Message</Button> */}
                     <Button onClick={handelTaskComplete} className="mr-4" variant="contained" disabled={!selectedTask.is_started || selectedTask.is_complete}>Task Completed</Button>
-                    <Button onClick={handelCompleteLandMark} className="mr-4" variant="contained" disabled={!selectedTask.is_started || selectedTask.is_complete}>Mark Landmark Complete</Button>
-                    <Button onClick={handelReallocate} className="mr-4" variant="contained" disabled={!selectedTask.is_started || selectedTask.is_complete}>User Reallocate</Button>
-                    {/* <Button onClick={handelUploadFile} className="mr-4" variant="contained" disabled={!selectedTask.is_started || selectedTask.is_complete}>Upload Media</Button> */}
                     <Button onClick={handelAccept} className="mr-4" variant="contained" disabled={selectedTask.is_complete}>Accept</Button>
                 </Stack>
             </div>
 
             {isModalOpen && (
             <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50" style={{backdropFilter:"blur(2px)"}}>
-                {/* Modal Content */}
                 <div className="bg-black rounded-lg shadow-lg w-11/12 max-w-md mx-auto p-5">
                 <h3 className="text-lg font-semibold text-white-800 mb-4 text-center">Add User</h3>
-
-                <div className="w-full border border-gray-300 rounded-md p-3 mb-4 text-gray-700 focus:ring-2 focus:ring-blue-500 focus:outline-none">
-                <Select options={addUserList}  isMulti onChange={handelSelectedAddUser} />    
-                {errors.addNewUser && <p className="text-meta-1">{errors.addNewUser}</p>}
-
+                <div className="w-full  rounded-md p-3 mb-4 text-gray-700 focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                    <Select options={addUserList} styles={customStyles} isMulti onChange={handelSelectedAddUser} />    
+                    {errors.addNewUser && <p className="text-meta-1">{errors.addNewUser}</p>}
                 </div>          
-        
-
-                {/* Buttons */}
                 <div className="flex justify-between">
                     <button
                     onClick={()=>{ setIsModalOpen(false)}}
@@ -564,6 +649,26 @@ const TaskDetail:React.FC<{ setPage: Function; selectedTask: any ,setSelectedTas
                     Submit
                     </button>
                 </div>
+                </div>
+            </div>
+            )}
+
+            {(isRemoveModalOpen && selectedRemoveUser )&& (
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50" style={{backdropFilter:"blur(2px)"}}>
+                {/* Modal Content */}
+                <div className="bg-black rounded-lg shadow-lg w-11/12 max-w-md mx-auto p-5">
+                    <h3 className="text-lg font-semibold text-white-800 mb-4 text-center">Please Conform    </h3>
+                    <div className="mb-2 p-5 text-center text-red-500 font-bold text-lg">
+                        Confirm remove {selectedRemoveUser.first_name}
+                    </div>
+                    <div className="flex justify-between">
+                        <button  onClick={()=>{ setIsRemoveModalOpen(false)}} className="w-[48%] px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-400">
+                            Cancel
+                        </button>
+                        <button onClick={handelRemoveUser} className="w-[48%] px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            Remove
+                        </button>
+                    </div>
                 </div>
             </div>
             )}

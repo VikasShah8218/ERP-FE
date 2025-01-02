@@ -12,6 +12,16 @@ import { faAngleLeft } from '@fortawesome/free-solid-svg-icons';
 
 const CreateTask: React.FC<{ setPage: Function; refreshTaskList:Function}> = ({setPage , refreshTaskList}) => {
   type Landmark = { value: string };
+  type FormDataType = {
+    name: string;
+    landmarks: string;
+    estimate_ex_date: Date | null;
+    note: string;
+    assigned_users: any[]; 
+    latitude: string;
+    longitude: string;
+    is_private?: boolean; 
+  };
   const [optiosUsers,setOptiosUsers] = useState([])
   const [selectedUsers,setSelectedUsers] = useState([])
   const [landmarkList,setLandmarkList] = useState([])
@@ -20,7 +30,8 @@ const CreateTask: React.FC<{ setPage: Function; refreshTaskList:Function}> = ({s
   const [selectedLandMark,setSelectedLandMark] = useState<any[]>([])
   const [landMarkWithUser,setLandmarkWithUser] = useState<Record<string, Landmark[]>>({});
   const [errors, setErrors] = useState<any>({});
-  const [formData, setFormData] = useState({name:"", landmarks:"", estimate_ex_date: null as Date | null,note: "", assigned_users:[],latitude:"32.709240759054076",longitude:"74.8633072414406"});
+  const [isOn, setIsOn] = useState(false);
+  const [formData, setFormData] = useState<FormDataType>({name:"", landmarks:"", estimate_ex_date: null as Date | null,note: "", assigned_users:[],latitude:"32.709240759054076",longitude:"74.8633072414406"});
 
   const getUsers = async()=> {
     const resUsers = await getFromServer("/task_flow/get-users-with-landmarks/");
@@ -104,6 +115,45 @@ const CreateTask: React.FC<{ setPage: Function; refreshTaskList:Function}> = ({s
     handelSelectedLandmark(allFilteredLandmarks);
   };
 
+  const ToggleButton = () => {
+    const handleToggle = () => {
+      setIsOn((prevState) => !prevState);
+      setFormData((prevData) => {
+          if (!isOn) {
+              return { ...prevData, is_private: true };
+          } else {
+              const { is_private, ...rest } = prevData;
+              return rest;
+          }
+      });
+
+      console.log(isOn ? "not ok" : "ok");
+
+    };
+
+    return (
+        // <div onClick={handleToggle} className={`relative w-14 h-8 flex items-center rounded-full p-1 cursor-pointer transition ${isOn ? "bg-blue-600" : "bg-gray-400"}`}>
+        //     <div className={`w-6 h-6 rounded-full bg-white shadow-md transform transition ${isOn ? "translate-x-6" : "translate-x-0"}`}>
+        //     { !isOn && <>🔓</> }
+        //         {isOn && (
+        //           // 🔓
+        //             <div className="absolute inset-0 flex items-center justify-center">
+        //                 <span role="img" aria-label="moon">
+        //                  🔒
+        //                 </span>
+        //             </div>
+        //         )}
+        //     </div>
+        // </div>
+        <div onClick={handleToggle} className={`relative w-14 h-8 flex items-center rounded-full p-1 cursor-pointer transition-all duration-300 ease-in-out ${isOn ? "bg-blue-600" : "bg-gray-400"}`}>
+          <div className={`w-6 h-6 rounded-full bg-white shadow-md transform transition-transform duration-300 ease-in-out ${isOn ? "translate-x-6" : "translate-x-0"}`}>
+            {!isOn && <div className="absolute inset-0 flex items-center justify-center"><span role="img" aria-label="unlocked">🔓</span></div>}
+            {isOn && <div className="absolute inset-0 flex items-center justify-center"><span role="img" aria-label="locked">🔒</span></div>}
+          </div>
+        </div>
+
+    );
+  };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value, type, multiple } = e.target;
@@ -170,11 +220,12 @@ const CreateTask: React.FC<{ setPage: Function; refreshTaskList:Function}> = ({s
     <div className="flex flex-col gap-9">
       {/* <!-- Contact Form --> */}
       <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
-        <div className="border-b border-stroke py-4 px-6.5 dark:border-strokedark">
-          <h3 className="font-medium text-black dark:text-white">
-            Create New Task 
-          </h3>
-        </div>
+      <div className="border-b border-stroke py-4 px-6.5 dark:border-strokedark flex justify-between items-center">
+  <h3 className="font-medium text-black dark:text-white">
+    Create New Task
+  </h3>
+  <ToggleButton />
+</div>
         <form  onSubmit={handleTaskCreateSubmit}>
           <div className="p-6.5">
 

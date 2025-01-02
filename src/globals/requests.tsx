@@ -3,6 +3,7 @@ import { getAuthToken } from "./auth";
 
 // constants
 const BASE_URL = "http://localhost:8000";
+// const BASE_URL = "http://192.168.1.12:8000";
 
 const ERROR_MSG = { type: "error", text: "Something went wrong." };
 
@@ -162,4 +163,4 @@ const deleteFromServer = async (url:string, data = {}) => {
   }
 };
 
-export { getFromServer, postToServer, putToServer ,deleteFromServer,patchToServer,postToServerFileUpload };
+export { getFromServer, postToServer, putToServer ,deleteFromServer,patchToServer,postToServerFileUpload ,BASE_URL};
