@@ -4,8 +4,6 @@ import { useDispatch } from "react-redux";
 import { logout } from "../../app/slices/authSlice";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-
-// const UpdateUser: React.FC = (props:any) => {
 const UpdateUser: React.FC <{ setPage: Function; selectedUser: any }> = ({setPage,selectedUser,}) => {
   const [formData, setFormData] = useState({
     first_name: selectedUser.first_name,

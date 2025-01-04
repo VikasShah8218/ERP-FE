@@ -63,7 +63,6 @@ const AssignUser: React.FC <{ setPage: Function, mainUsers:any}> = ({setPage, ma
         validationErrors.landmarks = "At least one Landmark must be assigned.";
         return validationErrors;
     };
-
     const setUsers = async()=> {
         const temp:any = [];
         // console.log(mainUsers)
@@ -72,7 +71,6 @@ const AssignUser: React.FC <{ setPage: Function, mainUsers:any}> = ({setPage, ma
         });
         setOptiosUsers(temp)
     }
-
     const handelSelectedLandmark = (selected:any) =>{
         const temp:any =[]
         selected.forEach((element:any) => {
@@ -82,7 +80,6 @@ const AssignUser: React.FC <{ setPage: Function, mainUsers:any}> = ({setPage, ma
             return { ...prev, landmarks: temp };
         });
     }
-    
     const getLandmark = async()=> {
         const resLandmark = await getFromServer("/structure/landmarks");
         if (resLandmark.status){
@@ -104,7 +101,6 @@ const AssignUser: React.FC <{ setPage: Function, mainUsers:any}> = ({setPage, ma
             dispatch(logout())
         }
     }
-
     const handleChange = (selected:any) => {
         // console.log(selected)
         setFormData((prev) => {
@@ -112,37 +108,34 @@ const AssignUser: React.FC <{ setPage: Function, mainUsers:any}> = ({setPage, ma
         });
     };
 
-  const handleLinkUser = async(e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const validationErrors = validate();
-    if (Object.keys(validationErrors).length > 0) {
-      setErrors(validationErrors);
-    } else {
-      setErrors({});
-      
-      const resTaskCreate = await postToServer("/task_flow/users-with-landmarks/",formData)
-      if (resTaskCreate.status==200 || resTaskCreate.status==201){
-        // setPage("main")
-        getLinkedUser();
-        console.log(resTaskCreate.data)
-      }else if(resTaskCreate.status===401){
-        dispatch(logout())
-      }
-      else{
-        console.log("Error Occured")
-      }
-    //   console.log("Form Data Submitted:", formData);
-    //   alert(JSON.stringify(formData, null, 2)); // For demonstration purposes
-    }
-  };
+    const handleLinkUser = async(e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        const validationErrors = validate();
+        if (Object.keys(validationErrors).length > 0) {
+        setErrors(validationErrors);
+        } else {
+        setErrors({});
+        
+        const resTaskCreate = await postToServer("/task_flow/users-with-landmarks/",formData)
+        if (resTaskCreate.status==200 || resTaskCreate.status==201){
+            getLinkedUser();
+            setFormData({user_id: "",landmarks: []});
 
+        }else if(resTaskCreate.status===401){
+            dispatch(logout())
+        }
+        else{
+            console.log("Error Occured")
+            setErrors({})
+        }
+        }
+    };
 
     useEffect(()=>{
         setUsers();
         getLandmark();
         getLinkedUser();
     },[])
-
 
     return(
         <>

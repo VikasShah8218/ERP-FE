@@ -81,8 +81,8 @@ const TaskDetail:React.FC<{ setPage: Function; selectedTask: any ,setSelectedTas
     return taskMedia.map((media) => {
         let thumbnail = media.file; 
         if (media.file_type === "video") {
-        thumbnail = media.file.replace("task_media", "thumbnail").replace(".mp4", ".jpg");
-        } else if (media.file_type === "image" && media.file.endsWith(".jpg")) {
+        thumbnail = media.file.replace("task_media", "thumbnail").replace(".mp4", ".jpg",);
+        } else if (media.file_type === "image") {
         thumbnail = media.file.replace("task_media", "thumbnail");
         } else {
         thumbnail = "http://127.0.0.1:8000/media/default-thumbnail.jpg";
@@ -187,6 +187,7 @@ const TaskDetail:React.FC<{ setPage: Function; selectedTask: any ,setSelectedTas
         const response =  await patchToServer(`/task_flow/tasks/${selectedTask.id}/accept-task/`,formData);
         if (response.status === 201 || response.status === 200){
             getSelectedTask()
+            setErrors({})
             showMessages(response.data.detail);
             formData.conversation = "";
         }else{

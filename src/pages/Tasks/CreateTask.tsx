@@ -177,26 +177,12 @@ const CreateTask: React.FC<{ setPage: Function; refreshTaskList:Function}> = ({s
     };
 
     return (
-        // <div onClick={handleToggle} className={`relative w-14 h-8 flex items-center rounded-full p-1 cursor-pointer transition ${isOn ? "bg-blue-600" : "bg-gray-400"}`}>
-        //     <div className={`w-6 h-6 rounded-full bg-white shadow-md transform transition ${isOn ? "translate-x-6" : "translate-x-0"}`}>
-        //     { !isOn && <>🔓</> }
-        //         {isOn && (
-        //           // 🔓
-        //             <div className="absolute inset-0 flex items-center justify-center">
-        //                 <span role="img" aria-label="moon">
-        //                  🔒
-        //                 </span>
-        //             </div>
-        //         )}
-        //     </div>
-        // </div>
         <div onClick={handleToggle} className={`relative w-14 h-8 flex items-center rounded-full p-1 cursor-pointer transition-all duration-300 ease-in-out ${isOn ? "bg-blue-600" : "bg-gray-400"}`}>
           <div className={`w-6 h-6 rounded-full bg-white shadow-md transform transition-transform duration-300 ease-in-out ${isOn ? "translate-x-6" : "translate-x-0"}`}>
             {!isOn && <div className="absolute inset-0 flex items-center justify-center"><span role="img" aria-label="unlocked">🔓</span></div>}
             {isOn && <div className="absolute inset-0 flex items-center justify-center"><span role="img" aria-label="locked">🔒</span></div>}
           </div>
         </div>
-
     );
   };
 
@@ -272,7 +258,7 @@ const CreateTask: React.FC<{ setPage: Function; refreshTaskList:Function}> = ({s
     Create New Task
   </h3>
   <ToggleButton />
-</div>
+  </div>
         <form  onSubmit={handleTaskCreateSubmit}>
           <div className="p-6.5">
 

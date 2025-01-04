@@ -4,7 +4,9 @@ import Stack from '@mui/material/Stack';
 import Button from '@mui/material/Button';
 import { useDispatch } from "react-redux";
 import { logout } from "../../app/slices/authSlice";
-import UserImage from "../../static/image/user.png"
+import UserImage from "../../static/image/user.png";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+
 
 
 
@@ -35,8 +37,12 @@ const ShowUsers:React.FC<{ setPage: Function; setMainUsers:any , setSelectedUser
         <>
         <div className="mb-2">
             <Stack spacing={2} direction="row">
-                <Button onClick={()=>setPage("register")} className="mr-4" variant="contained">  Add User</Button>
-                <Button onClick={()=>setPage("assign")} className="mr-4" variant="contained"> Link User</Button>
+                <button type="button" onClick={()=>setPage("register")} className={`ml-0 mb-1 lg:mt-0 rounded-lg px-3 py-2 text-sm transition bg-primary text-white hover:bg-primary-dark`}>
+                    Add User
+                </button>
+                <button type="button" onClick={()=>setPage("assign")} className={`ml-0 mb-1 lg:mt-0 rounded-lg px-3 py-2 text-sm transition bg-primary text-white hover:bg-primary-dark`}>
+                    Link User
+                </button>
             </Stack>
         </div>
         <div className="rounded-sm border border-stroke bg-white px-5 pt-6 pb-2.5 shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5 xl:pb-1">

@@ -9,9 +9,9 @@ const ShowTasks : React.FC<{ setPage: Function; allTasksList: any , setSelectedT
     return (
         <>
         <div>
-            <button type="button" onClick={()=>setPage("createTask")} className={`ml-0 mb-1 lg:mt-0 rounded-lg px-3 py-2 text-sm transition bg-primary text-white hover:bg-primary-dark`}>
-                <FontAwesomeIcon icon={faCirclePlus} />
-            </button>
+        <button type="button" onClick={()=>setPage("createTask")} className={`ml-0 mb-1 lg:mt-0 rounded-lg px-3 py-2 text-sm transition bg-primary text-white hover:bg-primary-dark`}>
+            <FontAwesomeIcon icon={faCirclePlus} />
+        </button>
         </div>
         <div className="rounded-sm border border-stroke bg-white px-5 pt-6 pb-2.5 shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5 xl:pb-1">
         <div className="max-w-full overflow-x-auto">
@@ -40,7 +40,7 @@ const ShowTasks : React.FC<{ setPage: Function; allTasksList: any , setSelectedT
             </thead>
             <tbody>
                 {allTasksList.map((task:any, key:any) => (
-                <tr key={key}>
+                <tr key={key} style={{cursor:"pointer"}} className='hover:scale-105 transition-transform duration-300  '  onClick={()=>{setPage("taskDetail");setSelectedTask(task)}} >
                     <td className="border-b border-[#eee] py-5 px-4 pl-9 dark:border-strokedark xl:pl-11">
                     <h5 className="font-medium text-black dark:text-white">
                         {task.name}
@@ -100,7 +100,7 @@ const ShowTasks : React.FC<{ setPage: Function; allTasksList: any , setSelectedT
                  
                     <td className="border-b border-[#eee] py-5 px-4 dark:border-strokedark">
                     <div className="flex items-center space-x-3.5">
-                        <button onClick={()=>{setPage("taskDetail");setSelectedTask(task);  }} className="hover:text-primary">
+                        <button onClick={()=>{setPage("taskDetail");setSelectedTask(task)}} className="hover:text-primary">
                         <svg
                             className="fill-current"
                             width="18"
