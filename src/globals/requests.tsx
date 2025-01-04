@@ -2,8 +2,8 @@ import axios from "axios";
 import { getAuthToken } from "./auth";
 
 // constants
-// const BASE_URL = "http://localhost:8000";
-const BASE_URL = 'http://13.53.197.82:8000';
+const BASE_URL = "http://localhost:8000";
+// const BASE_URL = 'http://13.53.197.82:8000';
 
 // const BASE_URL = "http://192.168.1.12:8000";
 
@@ -31,8 +31,7 @@ const getFromServer = async (url:any) => {
     if (res.status === 200 || res.status === 201) {
       return { status: true, data: res.data, detail: res.data.detail };
     } else {
-      console.log("Something got Wrong")
-      return { status:false};
+      return { status:res.status};
     }
   } catch (error:any) {
     if (error.response && error.response.data && error.response.data.detail) {

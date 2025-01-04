@@ -190,7 +190,10 @@ const TaskDetail:React.FC<{ setPage: Function; selectedTask: any ,setSelectedTas
             setErrors({})
             showMessages(response.data.detail);
             formData.conversation = "";
-        }else{
+        }
+        else if(response.status===401){
+            dispatch(logout())}
+        else{
             showErrorAlert(response.data.detail);
         }
     }
@@ -206,7 +209,9 @@ const TaskDetail:React.FC<{ setPage: Function; selectedTask: any ,setSelectedTas
             showMessages(response.data.detail);
             formData.conversation = "";
             setErrors({});
-        }else{
+        }else if(response.status===401){
+            dispatch(logout())}
+        else{
             showErrorAlert(response.data.detail);
         }
     }
@@ -222,7 +227,9 @@ const TaskDetail:React.FC<{ setPage: Function; selectedTask: any ,setSelectedTas
                 showMessages(response.data.detail);
                 getSelectedTask()
                 formData.conversation = "";
-            }else{
+            }else if(response.status===401){
+                dispatch(logout())}
+            else{
                 showErrorAlert(response.data.detail);
             }
     }
@@ -312,7 +319,8 @@ const TaskDetail:React.FC<{ setPage: Function; selectedTask: any ,setSelectedTas
             if (response.status === 201 || response.status === 200){
                 getSelectedTask()
                 showMessages(response.data.detail);
-            }
+            }else if(response.status===401){
+                dispatch(logout())}
             else{
                 showErrorAlert(response.data.detail);
             }
@@ -337,7 +345,8 @@ const TaskDetail:React.FC<{ setPage: Function; selectedTask: any ,setSelectedTas
             if (response.status === 201 || response.status === 200){
                 getSelectedTask()
                 showMessages(response.data.detail);
-            }
+            }else if(response.status===401){
+                dispatch(logout())}
             else{
                 showErrorAlert(response.data.detail);
             }

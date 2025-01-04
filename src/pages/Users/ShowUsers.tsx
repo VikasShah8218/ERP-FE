@@ -1,11 +1,9 @@
 import { getFromServer } from '../../globals/requests';
 import { useEffect, useState } from 'react';
 import Stack from '@mui/material/Stack';
-import Button from '@mui/material/Button';
 import { useDispatch } from "react-redux";
 import { logout } from "../../app/slices/authSlice";
 import UserImage from "../../static/image/user.png";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 
 
