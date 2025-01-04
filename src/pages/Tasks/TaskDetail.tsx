@@ -95,7 +95,7 @@ const TaskDetail:React.FC<{ setPage: Function; selectedTask: any ,setSelectedTas
     };
     const getTaskMediaFiels = async (selectedTask:any) => {
         const taskMedia = await getFromServer(`/task_flow/task-media/?task_id=${selectedTask.id}`);
-        if (taskMedia.status) {
+        if (taskMedia.status === 200 || taskMedia.status === 201 ) {
             const processedMedia = processTaskMedia(taskMedia.data.results);
             setTaskMedia(processedMedia); // Set the modified data
         }else if(taskMedia.status===401){
@@ -104,7 +104,7 @@ const TaskDetail:React.FC<{ setPage: Function; selectedTask: any ,setSelectedTas
     };
     const getSelectedTask = async () => {
         const resSelectedTask = await getFromServer(`/task_flow/tasks/${selectedTask.id}`);
-        if (resSelectedTask.status) {
+        if (resSelectedTask.status === 200 || resSelectedTask.status === 201) {
             setSelectedTask(resSelectedTask.data)
         }else if(resSelectedTask.status===401){
             dispatch(logout())
@@ -165,7 +165,7 @@ const TaskDetail:React.FC<{ setPage: Function; selectedTask: any ,setSelectedTas
     };
     const getReAllocatedUser = async()=> {
         const reAllocatedUser = await getFromServer(`/task_flow/task-re-allocations/filter-by-task/?task_id=${selectedTask.id}`);
-        if (reAllocatedUser.status){
+        if (reAllocatedUser.status=== 200 || reAllocatedUser.status === 201){
             setUserReallocateMap(reAllocatedUser.data.user_reallocate_map);
         }else if(reAllocatedUser.status===401){
             dispatch(logout())

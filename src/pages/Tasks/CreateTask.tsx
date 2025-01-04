@@ -74,7 +74,7 @@ const CreateTask: React.FC<{ setPage: Function; refreshTaskList:Function}> = ({s
 
   const getUsers = async()=> {
     const resUsers = await getFromServer("/task_flow/get-users-with-landmarks/");
-    if (resUsers.status){
+    if (resUsers.status=== 200 || resUsers.status === 201){
         const temp:any = [];
         const LandMarkData:any = {};
         resUsers.data.forEach((element:any) => {
@@ -95,7 +95,7 @@ const CreateTask: React.FC<{ setPage: Function; refreshTaskList:Function}> = ({s
   }
   const getLandmark = async()=> {
       const resLandmark = await getFromServer("/structure/landmarks");
-      if (resLandmark.status){
+      if (resLandmark.status=== 200 || resLandmark.status === 201){
           const temp:any = [];
           resLandmark.data.results.forEach((element:any) => {
             temp.push({value:element.id,label:element.name})
@@ -108,7 +108,7 @@ const CreateTask: React.FC<{ setPage: Function; refreshTaskList:Function}> = ({s
   }
   const getDistricts = async()=> {
       const resLandmark = await getFromServer("/structure/districts");
-      if (resLandmark.status){
+      if (resLandmark.status=== 200 || resLandmark.status === 201){
           const temp:any = [];
           resLandmark.data.results.forEach((element:any) => {
             temp.push({value:element.id,label:element.name})

@@ -29,7 +29,7 @@ const getFromServer = async (url:any) => {
   try {
     const res = await axios.get(`${BASE_URL}${url}`, { headers: genHeaders() });
     if (res.status === 200 || res.status === 201) {
-      return { status: true, data: res.data, detail: res.data.detail };
+      return { status: res.status, data: res.data, detail: res.data.detail };
     } else {
       return { status:res.status};
     }
