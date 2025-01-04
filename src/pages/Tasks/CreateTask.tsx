@@ -6,9 +6,8 @@ import "react-datepicker/dist/react-datepicker.css";
 import Select from 'react-select'
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faAngleLeft } from '@fortawesome/free-solid-svg-icons';
-
-
-
+import { useDispatch } from "react-redux";
+import { logout } from "../../app/slices/authSlice";
 
 const CreateTask: React.FC<{ setPage: Function; refreshTaskList:Function}> = ({setPage , refreshTaskList}) => {
   type Landmark = { value: string };
@@ -22,6 +21,45 @@ const CreateTask: React.FC<{ setPage: Function; refreshTaskList:Function}> = ({s
     longitude: string;
     is_private?: boolean; 
   };
+  const customStyles = {
+    control: (provided: any, state: any) => ({
+        ...provided,
+        backgroundColor: '#1E293B', // Dark background
+        borderColor: state.isFocused ? '#0EA5E9' : '#334155', // Highlighted border on focus
+        color: '#FFFFFF', // Text color
+        boxShadow: state.isFocused ? '0 0 0 2px rgba(14, 165, 233, 0.5)' : undefined,
+        '&:hover': {
+            borderColor: '#0EA5E9', // Hover border color
+        },
+    }),
+    singleValue: (provided: any) => ({
+        ...provided,
+        color: '#FFFFFF', // Text color for selected option
+    }),
+    menu: (provided: any) => ({
+        ...provided,
+        backgroundColor: '#1E293B', // Menu background color
+        border: '1px solid #334155',
+        zIndex: 10, // Ensure it appears above other elements
+    }),
+    option: (provided: any, state: any) => ({
+        ...provided,
+        backgroundColor: state.isFocused ? '#0EA5E9' : '#1E293B', // Highlighted option
+        color: '#FFFFFF',
+        cursor: 'pointer',
+        '&:hover': {
+            backgroundColor: '#0EA5E9',
+        },
+    }),
+    placeholder: (provided: any) => ({
+        ...provided,
+        color: '#94A3B8', // Placeholder color
+    }),
+    input: (provided: any) => ({
+        ...provided,
+        color: '#FFFFFF', // Ensure text color in the input field is white
+    }),
+  };
   const [optiosUsers,setOptiosUsers] = useState([])
   const [selectedUsers,setSelectedUsers] = useState([])
   const [landmarkList,setLandmarkList] = useState([])
@@ -32,6 +70,7 @@ const CreateTask: React.FC<{ setPage: Function; refreshTaskList:Function}> = ({s
   const [errors, setErrors] = useState<any>({});
   const [isOn, setIsOn] = useState(false);
   const [formData, setFormData] = useState<FormDataType>({name:"", landmarks:"", estimate_ex_date: null as Date | null,note: "", assigned_users:[],latitude:"32.709240759054076",longitude:"74.8633072414406"});
+  const dispatch = useDispatch();
 
   const getUsers = async()=> {
     const resUsers = await getFromServer("/task_flow/get-users-with-landmarks/");
@@ -50,6 +89,8 @@ const CreateTask: React.FC<{ setPage: Function; refreshTaskList:Function}> = ({s
         setOptiosUsers(temp)
         // setThisOptionUsers(temp)
         setLandmarkWithUser(LandMarkData)
+    }else if(resUsers.status===401){
+      dispatch(logout())
     }
   }
   const getLandmark = async()=> {
@@ -61,6 +102,8 @@ const CreateTask: React.FC<{ setPage: Function; refreshTaskList:Function}> = ({s
           });
           setLandmarkData(resLandmark.data.results)
           setLandmarkList(temp)
+      }else if(resLandmark.status===401){
+        dispatch(logout())
       }
   }
   const getDistricts = async()=> {
@@ -72,6 +115,8 @@ const CreateTask: React.FC<{ setPage: Function; refreshTaskList:Function}> = ({s
           });
           setDistrictList(temp)
           console.log(temp)
+      }else if(resLandmark.status===401){
+        dispatch(logout())
       }
   }
 
@@ -198,6 +243,8 @@ const CreateTask: React.FC<{ setPage: Function; refreshTaskList:Function}> = ({s
         refreshTaskList()
         setPage("main")
         console.log(resTaskCreate.data)
+      }else if(resTaskCreate.status===401){
+        dispatch(logout())
       }
       else{
         console.log("Error Occured")
@@ -245,22 +292,20 @@ const CreateTask: React.FC<{ setPage: Function; refreshTaskList:Function}> = ({s
                 {errors.name && <p className="text-meta-1">{errors.name}</p>}
               </div>
  
-              <div className="w-full xl:w-1/2">
+             
+              <div className="w-full xl:w-1/2" style={{zIndex:'2'}}>
                 <label className="mb-2.5 block text-black dark:text-white">
-                  Landmark <span className="text-meta-1">*</span>
+                  District <span className="text-meta-1">*</span>
                 </label>
-
                 <div className="relative z-20 bg-transparent dark:bg-form-input">
-                 
-                  <Select options={landmarkList} isMulti value={selectedLandMark} onChange={handelSelectedLandmark}/>
-
+                  <Select options={districtList} isMulti  styles={customStyles}  onChange={handelSelectedDistrict}/>
                   {errors.landmarks && <p className="text-meta-1">{errors.landmarks}</p>}
                 </div>
               </div>
             </div>
 
             <div className="mb-4.5 flex flex-col gap-6 xl:flex-row">
-              <div className="w-full xl:w-1/1">
+              <div className="w-full ">
                   <label className="mb-3 block text-sm font-medium text-black dark:text-white">
                     Estimate Work Complete 
                   </label>
@@ -274,12 +319,15 @@ const CreateTask: React.FC<{ setPage: Function; refreshTaskList:Function}> = ({s
                     />
                   {errors.estimate_ex_date && <p className="text-meta-1">{errors.estimate_ex_date}</p>}
               </div>
-              <div className="w-full xl:w-1/2">
+              <div className="w-full "  style={{zIndex:'1'}}>
                 <label className="mb-2.5 block text-black dark:text-white">
-                  District <span className="text-meta-1">*</span>
+                  Landmark <span className="text-meta-1">*</span>
                 </label>
+
                 <div className="relative z-20 bg-transparent dark:bg-form-input">
-                  <Select options={districtList} isMulti  onChange={handelSelectedDistrict}/>
+                 
+                  <Select options={landmarkList} isMulti styles={customStyles} value={selectedLandMark} onChange={handelSelectedLandmark}/>
+
                   {errors.landmarks && <p className="text-meta-1">{errors.landmarks}</p>}
                 </div>
               </div>
@@ -287,7 +335,7 @@ const CreateTask: React.FC<{ setPage: Function; refreshTaskList:Function}> = ({s
 
             <div className="mb-4.5 flex flex-col gap-6 xl:flex-row">
               <div className="w-full xl:w-1/1">
-              <Select options={optiosUsers} value={selectedUsers} isMulti onChange={handelSelectedUsers}/>
+              <Select options={optiosUsers} value={selectedUsers} styles={customStyles} isMulti onChange={handelSelectedUsers}/>
               {errors.assigned_users && <p className="text-meta-1">{errors.assigned_users}</p>}
               </div>
             </div>

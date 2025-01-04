@@ -2,8 +2,8 @@ import axios from "axios";
 import { getAuthToken } from "./auth";
 
 // constants
-// const BASE_URL = "http://localhost:8000";
-const BASE_URL = 'http://13.53.197.82:8000';
+const BASE_URL = "http://localhost:8000";
+// const BASE_URL = 'http://13.53.197.82:8000';
 
 // const BASE_URL = "http://192.168.1.12:8000";
 
@@ -31,12 +31,12 @@ const getFromServer = async (url:any) => {
     if (res.status === 200 || res.status === 201) {
       return { status: true, data: res.data, detail: res.data.detail };
     } else {
-      console.log("ERROR => Something went wrong.");
-      return {status:false}
+      console.log("Something got Wrong")
+      return { status:false};
     }
   } catch (error:any) {
     if (error.response && error.response.data && error.response.data.detail) {
-      return { status: false, detail: error.response.data.detail };
+      return { status: error.response.status, detail: error.response.data.detail };
     } else return { status: false, detail: ERROR_MSG };
   }
 };
@@ -64,19 +64,14 @@ const postToServer = async (url:string, data = {}) => {
     const res = await axios.post(`${BASE_URL}${url}`, data, {
       headers: genHeaders(),
     });
-    
-    // Optional: log headers for debugging
-    console.log(genHeaders());   
     return { status: res.status, data: res.data };  
   } catch (error:any) {
     if (error.response) {
-      // Handling the case when there's a detailed error response
       return { 
         status: error.response.status, 
         data: error.response.data 
       };
     } else {
-      // General fallback when error.response is undefined
       return { status: false, data: "An error occurred" };
     }
   }

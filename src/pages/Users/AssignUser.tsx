@@ -1,6 +1,8 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useState, useEffect } from "react";
 import { getFromServer , postToServer} from "../../globals/requests";
+import { useDispatch } from "react-redux";
+import { logout } from "../../app/slices/authSlice";
 
 import Select from 'react-select'
 
@@ -9,13 +11,51 @@ const AssignUser: React.FC <{ setPage: Function, mainUsers:any}> = ({setPage, ma
     const [landmarkList,setLandmarkList] = useState([])
     const [userLinkedlandmarkList,setUserLinkedLandmarkList] = useState([])
     const [errors, setErrors] = useState<any>({});
-
+    const dispatch = useDispatch(); 
 
     const [formData, setFormData] = useState({
         user_id: "", // Task name
         landmarks: [], // Array of assigned user IDs
     });
-
+    const customStyles = {
+        control: (provided: any, state: any) => ({
+            ...provided,
+            backgroundColor: '#1E293B', // Dark background
+            borderColor: state.isFocused ? '#0EA5E9' : '#334155', // Highlighted border on focus
+            color: '#FFFFFF', // Text color
+            boxShadow: state.isFocused ? '0 0 0 2px rgba(14, 165, 233, 0.5)' : undefined,
+            '&:hover': {
+                borderColor: '#0EA5E9', // Hover border color
+            },
+        }),
+        singleValue: (provided: any) => ({
+            ...provided,
+            color: '#FFFFFF', // Text color for selected option
+        }),
+        menu: (provided: any) => ({
+            ...provided,
+            backgroundColor: '#1E293B', // Menu background color
+            border: '1px solid #334155',
+            zIndex: 10, // Ensure it appears above other elements
+        }),
+        option: (provided: any, state: any) => ({
+            ...provided,
+            backgroundColor: state.isFocused ? '#0EA5E9' : '#1E293B', // Highlighted option
+            color: '#FFFFFF',
+            cursor: 'pointer',
+            '&:hover': {
+                backgroundColor: '#0EA5E9',
+            },
+        }),
+        placeholder: (provided: any) => ({
+            ...provided,
+            color: '#94A3B8', // Placeholder color
+        }),
+        input: (provided: any) => ({
+            ...provided,
+            color: '#FFFFFF', // Ensure text color in the input field is white
+        }),
+    };
     const validate = () => {
         const validationErrors: any = {};
         if (!formData.user_id) validationErrors.user_id = "User is required.";
@@ -51,6 +91,8 @@ const AssignUser: React.FC <{ setPage: Function, mainUsers:any}> = ({setPage, ma
                 temp.push({value:element.id,label:element.name})
             });
             setLandmarkList(temp)
+        }else if(resLandmark.status===401){
+            dispatch(logout())
         }
     }
     const getLinkedUser = async()=> {
@@ -58,6 +100,8 @@ const AssignUser: React.FC <{ setPage: Function, mainUsers:any}> = ({setPage, ma
         if (resLinkedUserLandmark.status){
             setUserLinkedLandmarkList(resLinkedUserLandmark.data)
             // console.log(resLinkedUserLandmark.data)
+        }else if(resLinkedUserLandmark.status===401){
+            dispatch(logout())
         }
     }
 
@@ -81,6 +125,8 @@ const AssignUser: React.FC <{ setPage: Function, mainUsers:any}> = ({setPage, ma
         // setPage("main")
         getLinkedUser();
         console.log(resTaskCreate.data)
+      }else if(resTaskCreate.status===401){
+        dispatch(logout())
       }
       else{
         console.log("Error Occured")
@@ -118,7 +164,7 @@ const AssignUser: React.FC <{ setPage: Function, mainUsers:any}> = ({setPage, ma
                                     </label>
 
                                     <div className="relative z-20 bg-transparent dark:bg-form-input">
-                                        <Select  options={optiosUsers} onChange={handleChange} />
+                                        <Select  options={optiosUsers}  styles={customStyles} onChange={handleChange} />
                                         {errors.user_id && <p className="text-meta-1">{errors.user_id}</p>}
                                     </div>
                             </div>
@@ -126,7 +172,7 @@ const AssignUser: React.FC <{ setPage: Function, mainUsers:any}> = ({setPage, ma
                                 <label className="mb-2.5 block text-black dark:text-white">
                                     Landmarks <span className="text-meta-1">*</span>
                                 </label>
-                                <Select options={landmarkList}  isMulti onChange={handelSelectedLandmark} />
+                                <Select options={landmarkList}  styles={customStyles}  isMulti onChange={handelSelectedLandmark} />
                                 {errors.landmarks && <p className="text-meta-1">{errors.landmarks}</p>}
                             </div>
                         </div>

@@ -1,23 +1,29 @@
 import { getFromServer } from '../../globals/requests';
 import { useEffect, useState } from 'react';
-// import { Link } from 'react-router-dom';
 import Stack from '@mui/material/Stack';
 import Button from '@mui/material/Button';
+import { useDispatch } from "react-redux";
+import { logout } from "../../app/slices/authSlice";
+import UserImage from "../../static/image/user.png"
+
 
 
 const ShowUsers:React.FC<{ setPage: Function; setMainUsers:any , setSelectedUser:any }> = ({setPage,setMainUsers,setSelectedUser}) => {
-    const [users, setUsers] = useState([])  
+    const [users, setUsers] = useState([])
+    const dispatch = useDispatch(); 
+
     const getUsers = async()=> {
         const resUsers = await getFromServer("/accounts/get-all-user");
         if (resUsers.status){
-            // console.log(resUsers.data.results)
             setUsers(resUsers.data.results)
             setMainUsers(resUsers.data.results)
+        }else if(resUsers.status===401){
+            dispatch(logout())
         }
     }
     const handleEditUser = (user: any) => {
-        setSelectedUser(user); // Set the selected user
-        setPage("update"); // Navigate to the UpdateUser page
+        setSelectedUser(user); 
+        setPage("update");
      };
     
     
@@ -62,12 +68,8 @@ const ShowUsers:React.FC<{ setPage: Function; setMainUsers:any , setSelectedUser
                 {users.map((user:any, key) => (
                 <tr key={key}>
                     <td className="border-b border-[#eee] py-5 px-4 pl-9 dark:border-strokedark xl:pl-11">
-                    {/* <h5 className="font-medium text-black dark:text-white">
-                        {user.name}
-                    </h5>
-                    <p className="text-sm">${user.price}</p> */}
                     <div className="h-12.5 w-15 rounded-md">
-                        <img src={`data:image/png;base64,${user.image}`} alt="user" />
+                        <img src={ user.image ? `data:image/jpeg;base64,${user.image}`: UserImage} alt="User"/>
                     </div>
                     </td>
                     <td className="border-b border-[#eee] py-5 px-4 dark:border-strokedark">

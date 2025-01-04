@@ -9,6 +9,8 @@ import PDFImage from '../../static/image/pdf.png'
 import { getCurrentLocation ,getPlaceName } from "../../utlis/locationUtils";
 import { showMessages , showErrorAlert} from '../../globals/messages';
 import { faCloudArrowUp,faPlus,faAngleLeft,faPaperPlane,faCheck} from '@fortawesome/free-solid-svg-icons';
+import { useDispatch } from "react-redux";
+import { logout } from "../../app/slices/authSlice";
 
 
 const TaskDetail:React.FC<{ setPage: Function; selectedTask: any ,setSelectedTask:Function, refreshTaskList:Function, optionUsers:any ,setOptionUsers:Function}> = ({setPage,selectedTask,refreshTaskList,optionUsers,setSelectedTask}) => {
@@ -30,6 +32,8 @@ const TaskDetail:React.FC<{ setPage: Function; selectedTask: any ,setSelectedTas
     const [selectedRemoveUser, setSelectedRemoveUser] = useState<any>();
     const [errors, setErrors] = useState<any>({});
     const fileRef = useRef(null);
+    const dispatch = useDispatch(); 
+
 
     interface MediaItem {id: number; file_type: string; file: string; thumbnail: string; }
     interface MediaGalleryProps {mediaData: MediaItem[];}
@@ -94,12 +98,16 @@ const TaskDetail:React.FC<{ setPage: Function; selectedTask: any ,setSelectedTas
         if (taskMedia.status) {
             const processedMedia = processTaskMedia(taskMedia.data.results);
             setTaskMedia(processedMedia); // Set the modified data
+        }else if(taskMedia.status===401){
+            dispatch(logout())
         }
     };
     const getSelectedTask = async () => {
         const resSelectedTask = await getFromServer(`/task_flow/tasks/${selectedTask.id}`);
         if (resSelectedTask.status) {
             setSelectedTask(resSelectedTask.data)
+        }else if(resSelectedTask.status===401){
+            dispatch(logout())
         }
     };
     const fetchLocationData = async () => {
@@ -159,6 +167,8 @@ const TaskDetail:React.FC<{ setPage: Function; selectedTask: any ,setSelectedTas
         const reAllocatedUser = await getFromServer(`/task_flow/task-re-allocations/filter-by-task/?task_id=${selectedTask.id}`);
         if (reAllocatedUser.status){
             setUserReallocateMap(reAllocatedUser.data.user_reallocate_map);
+        }else if(reAllocatedUser.status===401){
+            dispatch(logout())
         }
     }
     const handelSelectLandmarktoComplete = (selected:any) =>{
@@ -244,7 +254,10 @@ const TaskDetail:React.FC<{ setPage: Function; selectedTask: any ,setSelectedTas
                 getReAllocatedUser()
                 showMessages(response.data.detail);
                 formData.conversation = "";
-            }else{
+            }else if(response.status===401){
+                dispatch(logout())
+            }
+            else{
                 showErrorAlert(response.data.detail);
             }
     }
@@ -267,6 +280,8 @@ const TaskDetail:React.FC<{ setPage: Function; selectedTask: any ,setSelectedTas
                 refreshTaskList();
                 showMessages(response.data.detail);
 
+            }else if(response.status===401){
+                dispatch(logout())
             }else{
                 showErrorAlert(response.data.detail);
             }

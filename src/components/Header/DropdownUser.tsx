@@ -11,7 +11,6 @@ import UserImage from "../../static/image/user.png"
 
 const DropdownUser = () => {
   const dispatch = useDispatch();
-  // const [loggedInUser,setLoggedInUser] = useState<any>({})
   const loggedInUser =  useSelector((state:any) => state.auth.user)
 
   const logoutHandle = async () => {
@@ -21,7 +20,6 @@ const DropdownUser = () => {
 
   const [dropdownOpen, setDropdownOpen] = useState(false);
   useEffect(()=>{
-    // setLoggedInUser();
     console.log(loggedInUser)
   },[])
 

@@ -1,13 +1,17 @@
 import { Link } from 'react-router-dom';
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faCirclePlus } from '@fortawesome/free-solid-svg-icons';
+
+
 
 
 const ShowTasks : React.FC<{ setPage: Function; allTasksList: any , setSelectedTask:any }> = ({setPage, allTasksList,setSelectedTask}) => {
     return (
         <>
         <div>
-            <Link onClick={()=>setPage("createTask")} to="#" className="inline-flex items-center justify-center rounded-full bg-primary py-4 px-10 text-center font-medium text-white hover:bg-opacity-90 lg:px-8 xl:px-10">
-                Create Task
-            </Link>
+            <button type="button" onClick={()=>setPage("createTask")} className={`ml-0 mb-1 lg:mt-0 rounded-lg px-3 py-2 text-sm transition bg-primary text-white hover:bg-primary-dark`}>
+                <FontAwesomeIcon icon={faCirclePlus} />
+            </button>
         </div>
         <div className="rounded-sm border border-stroke bg-white px-5 pt-6 pb-2.5 shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5 xl:pb-1">
         <div className="max-w-full overflow-x-auto">

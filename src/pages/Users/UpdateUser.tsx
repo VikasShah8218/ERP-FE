@@ -1,6 +1,9 @@
 import React, { useState } from "react";
 import { patchToServer } from "../../globals/requests";
-// import { data } from "jquery";
+import { useDispatch } from "react-redux";
+import { logout } from "../../app/slices/authSlice";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+
 
 // const UpdateUser: React.FC = (props:any) => {
 const UpdateUser: React.FC <{ setPage: Function; selectedUser: any }> = ({setPage,selectedUser,}) => {
@@ -18,6 +21,7 @@ const UpdateUser: React.FC <{ setPage: Function; selectedUser: any }> = ({setPag
     employee_code:selectedUser.employee_code,
     image: null,
   });
+  const dispatch = useDispatch();
 
   const convertToBase64 = (file: File): Promise<string> => {
     return new Promise((resolve, reject) => {
@@ -80,6 +84,8 @@ const UpdateUser: React.FC <{ setPage: Function; selectedUser: any }> = ({setPag
       if (userRes.status==200 || userRes.status==201){
         setPage("main")
         console.log(userRes.data)
+      }else if(userRes.status===401){
+          dispatch(logout())
       }
       else{
         console.log("Error Occured")
@@ -92,6 +98,7 @@ const UpdateUser: React.FC <{ setPage: Function; selectedUser: any }> = ({setPag
 
   return(
     <>
+    <div onClick={()=>{setPage("main")}} > <FontAwesomeIcon icon="fa-solid fa-angle-left" /> </div> 
     <div className="flex flex-col gap-9">
       {/* <!-- Contact Form --> */}
       <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
