@@ -1,5 +1,7 @@
 import axios from "axios";
 import { getAuthToken } from "./auth";
+import store from "../path/to/store";
+import { logout } from "../path/to/slices/authSlice";
 
 // constants
 // const BASE_URL = "http://localhost:8000";
@@ -8,6 +10,11 @@ const BASE_URL = 'http://13.53.197.82:8000';
 // const BASE_URL = "http://192.168.1.12:8000";
 
 const ERROR_MSG = { type: "error", text: "Something went wrong." };
+
+function performLogout() {
+  store.dispatch(logout());
+  console.log("User logged out");
+}
 
 // helpers functions
 const genHeaders = () => {
@@ -30,7 +37,11 @@ const getFromServer = async (url:any) => {
     const res = await axios.get(`${BASE_URL}${url}`, { headers: genHeaders() });
     if (res.status === 200 || res.status === 201) {
       return { status: res.status, data: res.data, detail: res.data.detail };
-    } else {
+    } else if(res.status===401){
+               performLogout();
+                return {}
+            }
+    else {
       return { status:res.status};
     }
   } catch (error:any) {
@@ -63,6 +74,10 @@ const postToServer = async (url:string, data = {}) => {
     const res = await axios.post(`${BASE_URL}${url}`, data, {
       headers: genHeaders(),
     });
+    if(res.status===401){
+      performLogout();
+       return {}
+   }
     return { status: res.status, data: res.data };  
   } catch (error:any) {
     if (error.response) {
@@ -83,6 +98,10 @@ const postToServerFileUpload = async (url:string, data = new FormData()) => {
     const res = await axios.post(`${BASE_URL}${url}`, data, {
       headers: genFormHeaders(),
     });
+    if(res.status===401){
+      performLogout();
+       return {}
+   }
     return { status: res.status, data: res.data };  
   } catch (error:any) {
     if (error.response) {
@@ -103,7 +122,10 @@ const patchToServer = async (url:string, data = {}) => {
     const res = await axios.patch(`${BASE_URL}${url}`, data, {
       headers: genHeaders(),
     });
-    
+    if(res.status===401){
+      performLogout();
+       return {}
+   }
     // Optional: log headers for debugging
     console.log(genHeaders());   
     return { status: res.status, data: res.data };  
