@@ -2,8 +2,8 @@ import axios from "axios";
 import { getAuthToken } from "./auth";
 
 // constants
-const BASE_URL = "http://localhost:8000";
-// const BASE_URL = 'http://13.53.197.82:8000';
+// const BASE_URL = "http://localhost:8000";
+const BASE_URL = 'http://13.53.197.82:8000';
 
 // const BASE_URL = "http://192.168.1.12:8000";
 
