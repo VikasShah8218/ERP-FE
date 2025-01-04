@@ -47,28 +47,15 @@ const getFromServer = async (url:any) => {
     }
   } catch (error:any) {
     if (error.response && error.response.data && error.response.data.detail) {
+      if(error.response.status===401){
+        performLogout();
+         return {}
+      }
       return { status: error.response.status, detail: error.response.data.detail };
     } else return { status: false, detail: ERROR_MSG };
   }
 };
 
-// const postToServer = async (url, data = {}) => {
-//   try {
-//     const res = await axios.post(`${BASE_URL}${url}`, data, {
-//       headers: genHeaders(),
-//     });
-//     console.log(genHeaders())
-//     if (res.status === 200 || res.status === 201) {
-//       return { status: true, data: res.data };
-//     } else {
-//       return {status:res.status}
-//     }
-//   } catch (error) {
-//     if (error.response && error.response.data && error.response.data.detail) {
-//       return { status: error.response.status, data: error.response.data };
-//     } else return { status: error.response.status,  data: error.response.data };
-//   }
-// };
 
 const postToServer = async (url:string, data = {}) => {
   try {
@@ -82,6 +69,10 @@ const postToServer = async (url:string, data = {}) => {
     return { status: res.status, data: res.data };  
   } catch (error:any) {
     if (error.response) {
+      if(error.response.status===401){
+        performLogout();
+         return {}
+      }
       return { 
         status: error.response.status, 
         data: error.response.data 
@@ -106,6 +97,10 @@ const postToServerFileUpload = async (url:string, data = new FormData()) => {
     return { status: res.status, data: res.data };  
   } catch (error:any) {
     if (error.response) {
+      if(error.response.status===401){
+        performLogout();
+         return {}
+      }
       return { 
         status: error.response.status, 
         data: error.response.data 
@@ -132,6 +127,10 @@ const patchToServer = async (url:string, data = {}) => {
     return { status: res.status, data: res.data };  
   } catch (error:any) {
     if (error.response) {
+      if(error.response.status===401){
+        performLogout();
+         return {}
+      }
       // Handling the case when there's a detailed error response
       return { 
         status: error.response.status, 
