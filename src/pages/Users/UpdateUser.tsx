@@ -1,8 +1,7 @@
 import React, { useState } from "react";
 import { patchToServer } from "../../globals/requests";
-import { useDispatch } from "react-redux";
-import { logout } from "../../app/slices/authSlice";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { showErrorAlert, showMessages } from "../../globals/messages";
 
 const UpdateUser: React.FC <{ setPage: Function; selectedUser: any }> = ({setPage,selectedUser,}) => {
   const [formData, setFormData] = useState({
@@ -19,7 +18,6 @@ const UpdateUser: React.FC <{ setPage: Function; selectedUser: any }> = ({setPag
     employee_code:selectedUser.employee_code,
     image: null,
   });
-  const dispatch = useDispatch();
 
   const convertToBase64 = (file: File): Promise<string> => {
     return new Promise((resolve, reject) => {
@@ -49,7 +47,6 @@ const UpdateUser: React.FC <{ setPage: Function; selectedUser: any }> = ({setPag
     if (!formData.work_location.trim()) validationErrors.work_location = "Work location is required.";
     if (!formData.department.trim()) validationErrors.department = "Department is required.";
     if (!formData.address.trim()) validationErrors.address = "Address is required.";
-    // if (!formData.password.trim()) validationErrors.password = "Password is required.";
     if (!formData.employee_code.trim()) validationErrors.employee_code = "Employee Code is required.";
     if (!formData.username.trim()) validationErrors.username = "Username is required.";
     return validationErrors;
@@ -82,15 +79,11 @@ const UpdateUser: React.FC <{ setPage: Function; selectedUser: any }> = ({setPag
       if (userRes.status==200 || userRes.status==201){
         setPage("main")
         console.log(userRes.data)
-      }else if(userRes.status===401){
-          dispatch(logout())
+        showMessages(userRes.data.detail)
       }
       else{
-        console.log("Error Occured")
+        showErrorAlert(userRes.data.detail)
       }
-      // alert(JSON.stringify(formDataToSubmit, null, 2)); // For demonstration purposes
-      // console.log("Form Data Submitted:", formData);
-      // alert(JSON.stringify(formData, null, 2)); // For demonstration purposes
     }
   };
 

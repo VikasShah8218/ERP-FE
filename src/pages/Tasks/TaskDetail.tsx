@@ -9,8 +9,6 @@ import PDFImage from '../../static/image/pdf.png'
 import { getCurrentLocation ,getPlaceName } from "../../utlis/locationUtils";
 import { showMessages , showErrorAlert} from '../../globals/messages';
 import { faCloudArrowUp,faPlus,faAngleLeft,faPaperPlane,faCheck} from '@fortawesome/free-solid-svg-icons';
-import { useDispatch } from "react-redux";
-import { logout } from "../../app/slices/authSlice";
 
 
 const TaskDetail:React.FC<{ setPage: Function; selectedTask: any ,setSelectedTask:Function, refreshTaskList:Function, optionUsers:any ,setOptionUsers:Function}> = ({setPage,selectedTask,refreshTaskList,optionUsers,setSelectedTask}) => {
@@ -32,7 +30,6 @@ const TaskDetail:React.FC<{ setPage: Function; selectedTask: any ,setSelectedTas
     const [selectedRemoveUser, setSelectedRemoveUser] = useState<any>();
     const [errors, setErrors] = useState<any>({});
     const fileRef = useRef(null);
-    const dispatch = useDispatch(); 
 
 
     interface MediaItem {id: number; file_type: string; file: string; thumbnail: string; }
@@ -95,19 +92,15 @@ const TaskDetail:React.FC<{ setPage: Function; selectedTask: any ,setSelectedTas
     };
     const getTaskMediaFiels = async (selectedTask:any) => {
         const taskMedia = await getFromServer(`/task_flow/task-media/?task_id=${selectedTask.id}`);
-        if (taskMedia.status === 200 || taskMedia.status === 201 ) {
+        if (taskMedia.status) {
             const processedMedia = processTaskMedia(taskMedia.data.results);
             setTaskMedia(processedMedia); // Set the modified data
-        }else if(taskMedia.status===401){
-            dispatch(logout())
         }
     };
     const getSelectedTask = async () => {
         const resSelectedTask = await getFromServer(`/task_flow/tasks/${selectedTask.id}`);
-        if (resSelectedTask.status === 200 || resSelectedTask.status === 201) {
+        if (resSelectedTask.status) {
             setSelectedTask(resSelectedTask.data)
-        }else if(resSelectedTask.status===401){
-            dispatch(logout())
         }
     };
     const fetchLocationData = async () => {
@@ -165,10 +158,8 @@ const TaskDetail:React.FC<{ setPage: Function; selectedTask: any ,setSelectedTas
     };
     const getReAllocatedUser = async()=> {
         const reAllocatedUser = await getFromServer(`/task_flow/task-re-allocations/filter-by-task/?task_id=${selectedTask.id}`);
-        if (reAllocatedUser.status=== 200 || reAllocatedUser.status === 201){
+        if (reAllocatedUser.status){
             setUserReallocateMap(reAllocatedUser.data.user_reallocate_map);
-        }else if(reAllocatedUser.status===401){
-            dispatch(logout())
         }
     }
     const handelSelectLandmarktoComplete = (selected:any) =>{
@@ -191,8 +182,6 @@ const TaskDetail:React.FC<{ setPage: Function; selectedTask: any ,setSelectedTas
             showMessages(response.data.detail);
             formData.conversation = "";
         }
-        else if(response.status===401){
-            dispatch(logout())}
         else{
             showErrorAlert(response.data.detail);
         }
@@ -209,8 +198,7 @@ const TaskDetail:React.FC<{ setPage: Function; selectedTask: any ,setSelectedTas
             showMessages(response.data.detail);
             formData.conversation = "";
             setErrors({});
-        }else if(response.status===401){
-            dispatch(logout())}
+        }
         else{
             showErrorAlert(response.data.detail);
         }
@@ -227,8 +215,7 @@ const TaskDetail:React.FC<{ setPage: Function; selectedTask: any ,setSelectedTas
                 showMessages(response.data.detail);
                 getSelectedTask()
                 formData.conversation = "";
-            }else if(response.status===401){
-                dispatch(logout())}
+            }
             else{
                 showErrorAlert(response.data.detail);
             }
@@ -257,13 +244,9 @@ const TaskDetail:React.FC<{ setPage: Function; selectedTask: any ,setSelectedTas
         else{
             const response =  await postToServer(`/task_flow/task-re-allocations/`,formDataRe);
             if (response.status === 201 || response.status === 200){
-                // refreshTaskList();
-                // setPage("main");
                 getReAllocatedUser()
                 showMessages(response.data.detail);
                 formData.conversation = "";
-            }else if(response.status===401){
-                dispatch(logout())
             }
             else{
                 showErrorAlert(response.data.detail);
@@ -288,8 +271,6 @@ const TaskDetail:React.FC<{ setPage: Function; selectedTask: any ,setSelectedTas
                 refreshTaskList();
                 showMessages(response.data.detail);
 
-            }else if(response.status===401){
-                dispatch(logout())
             }else{
                 showErrorAlert(response.data.detail);
             }
@@ -319,8 +300,7 @@ const TaskDetail:React.FC<{ setPage: Function; selectedTask: any ,setSelectedTas
             if (response.status === 201 || response.status === 200){
                 getSelectedTask()
                 showMessages(response.data.detail);
-            }else if(response.status===401){
-                dispatch(logout())}
+            }
             else{
                 showErrorAlert(response.data.detail);
             }
@@ -345,8 +325,7 @@ const TaskDetail:React.FC<{ setPage: Function; selectedTask: any ,setSelectedTas
             if (response.status === 201 || response.status === 200){
                 getSelectedTask()
                 showMessages(response.data.detail);
-            }else if(response.status===401){
-                dispatch(logout())}
+            }
             else{
                 showErrorAlert(response.data.detail);
             }

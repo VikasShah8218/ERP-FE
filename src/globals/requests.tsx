@@ -1,8 +1,7 @@
 import axios from "axios";
 import { getAuthToken } from "./auth";
 import store from "../app/store";
-import { logout } from "../app/slices/authSlice";
-
+import { logout, setRequestLoading } from "../app/slices/authSlice";
 
 // constants
 // const BASE_URL = "http://localhost:8000";
@@ -11,11 +10,6 @@ const BASE_URL = 'http://13.53.197.82:8000';
 // const BASE_URL = "http://192.168.1.12:8000";
 
 const ERROR_MSG = { type: "error", text: "Something went wrong." };
-
-function performLogout() {
-  store.dispatch(logout());
-  console.log("User logged out");
-}
 
 // helpers functions
 const genHeaders = () => {
@@ -35,20 +29,22 @@ const genFormHeaders = () => {
 
 const getFromServer = async (url:any) => {
   try {
+    store.dispatch(setRequestLoading(true))
     const res = await axios.get(`${BASE_URL}${url}`, { headers: genHeaders() });
+    store.dispatch(setRequestLoading(false))
     if (res.status === 200 || res.status === 201) {
-      return { status: res.status, data: res.data, detail: res.data.detail };
+      return { status: true, data: res.data, detail: res.data.detail };
     } else if(res.status===401){
-               performLogout();
+               store.dispatch(logout());;
                 return {}
             }
     else {
-      return { status:res.status};
+      return { status:false};
     }
   } catch (error:any) {
     if (error.response && error.response.data && error.response.data.detail) {
       if(error.response.status===401){
-        performLogout();
+        store.dispatch(logout());;
          return {}
       }
       return { status: error.response.status, detail: error.response.data.detail };
@@ -59,24 +55,19 @@ const getFromServer = async (url:any) => {
 
 const postToServer = async (url:string, data = {}) => {
   try {
+    store.dispatch(setRequestLoading(true))
     const res = await axios.post(`${BASE_URL}${url}`, data, {
       headers: genHeaders(),
     });
-    if(res.status===401){
-      performLogout();
-       return {}
+    store.dispatch(setRequestLoading(false))
+
+    if(res.status===401){store.dispatch(logout());;return {}
    }
     return { status: res.status, data: res.data };  
   } catch (error:any) {
     if (error.response) {
-      if(error.response.status===401){
-        performLogout();
-         return {}
-      }
-      return { 
-        status: error.response.status, 
-        data: error.response.data 
-      };
+      if(error.response.status===401){store.dispatch(logout());; return {}}
+      return { status: error.response.status, data: error.response.data };
     } else {
       return { status: false, data: "An error occurred" };
     }
@@ -86,19 +77,20 @@ const postToServer = async (url:string, data = {}) => {
 
 const postToServerFileUpload = async (url:string, data = new FormData()) => {
   try {
-    
+    store.dispatch(setRequestLoading(true))
     const res = await axios.post(`${BASE_URL}${url}`, data, {
       headers: genFormHeaders(),
     });
+    store.dispatch(setRequestLoading(false))
     if(res.status===401){
-      performLogout();
+      store.dispatch(logout());;
        return {}
    }
     return { status: res.status, data: res.data };  
   } catch (error:any) {
     if (error.response) {
       if(error.response.status===401){
-        performLogout();
+        store.dispatch(logout());;
          return {}
       }
       return { 
@@ -115,29 +107,27 @@ const postToServerFileUpload = async (url:string, data = new FormData()) => {
 
 const patchToServer = async (url:string, data = {}) => {
   try {
+    store.dispatch(setRequestLoading(true))
     const res = await axios.patch(`${BASE_URL}${url}`, data, {
       headers: genHeaders(),
     });
+    store.dispatch(setRequestLoading(false))
     if(res.status===401){
-      performLogout();
+      store.dispatch(logout());;
        return {}
    }
-    // Optional: log headers for debugging
-    console.log(genHeaders());   
     return { status: res.status, data: res.data };  
   } catch (error:any) {
     if (error.response) {
       if(error.response.status===401){
-        performLogout();
+        store.dispatch(logout());;
          return {}
       }
-      // Handling the case when there's a detailed error response
       return { 
         status: error.response.status, 
         data: error.response.data 
       };
     } else {
-      // General fallback when error.response is undefined
       return { status: false, detail: "An error occurred" };
     }
   }

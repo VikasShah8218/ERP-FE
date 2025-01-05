@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { postToServer } from "../../globals/requests";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { useDispatch } from "react-redux";
-import { logout } from "../../app/slices/authSlice";
+import { showErrorAlert, showMessages } from "../../globals/messages";
+
 
 // import { data } from "jquery";
 
@@ -21,7 +21,6 @@ const RegisterUser:React.FC<{ setPage: any}> = ({setPage}) => {
     employee_code:"",
     image: null,
   });
-  const dispatch = useDispatch();
 
   const convertToBase64 = (file: File): Promise<string> => {
     return new Promise((resolve, reject) => {
@@ -83,15 +82,11 @@ const RegisterUser:React.FC<{ setPage: any}> = ({setPage}) => {
       console.log("Form Data Submitted:", formDataToSubmit);
       if (userRes.status==200 || userRes.status==201){
         setPage("main")
-      }else if(userRes.status===401){
-          dispatch(logout())
+        showMessages(userRes.data.detail)
       }
       else{
-        console.log("Error Occured")
+        showErrorAlert(userRes.data.detail)
       }
-      // alert(JSON.stringify(formDataToSubmit, null, 2)); // For demonstration purposes
-      // console.log("Form Data Submitted:", formData);
-      // alert(JSON.stringify(formData, null, 2)); // For demonstration purposes
     }
   };
 

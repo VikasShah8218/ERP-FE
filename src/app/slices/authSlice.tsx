@@ -8,6 +8,7 @@ export const authSlice = createSlice({
   initialState: {
     authenticated: checkInitialAuth(),
     user: loadUserInfo(),
+    requestLoading : false,
   },
   reducers: {
     login: (state, action) => {
@@ -20,10 +21,13 @@ export const authSlice = createSlice({
       state.authenticated = false;
       logoutUser();
     },
+    setRequestLoading:(state,action) =>{
+      state.requestLoading = action.payload
+    }
   },
 });
 
 // Action creators are generated for each case reducer function
-export const { login, logout } = authSlice.actions;
+export const { login, logout, setRequestLoading } = authSlice.actions;
 
 export default authSlice.reducer;

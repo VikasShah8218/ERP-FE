@@ -4,8 +4,6 @@ import { useEffect, useState } from 'react';
 import CreateTask from "./CreateTask";
 import TaskDetail from "./TaskDetail";
 import { useSelector } from "react-redux";
-import { useDispatch } from "react-redux";
-import { logout } from "../../app/slices/authSlice";
 
 const Users :React.FC = () => {
     
@@ -14,15 +12,12 @@ const Users :React.FC = () => {
     const [allTasksList,setAllTasksList] = useState([])
     const [selectedTask,setSelectedTask] = useState({})
     const [optionUsers,setOptionUsers] = useState<any[]>([])
-    const dispatch = useDispatch();
     
  
     const getAllTaskList = async()=> {
         const resTasks = await getFromServer("/task_flow/tasks");
         if (resTasks.status){
             setAllTasksList(resTasks.data.results)
-        }else if(resTasks.status===401){
-            dispatch(logout())
         }
     }
     
@@ -43,8 +38,6 @@ const Users :React.FC = () => {
             }
           });
           setOptionUsers(temp)
-      }else if(resUsers.status===401){
-        dispatch(logout())
       }
       }
 

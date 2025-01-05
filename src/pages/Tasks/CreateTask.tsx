@@ -6,8 +6,7 @@ import "react-datepicker/dist/react-datepicker.css";
 import Select from 'react-select'
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faAngleLeft } from '@fortawesome/free-solid-svg-icons';
-import { useDispatch } from "react-redux";
-import { logout } from "../../app/slices/authSlice";
+import { showErrorAlert, showMessages } from "../../globals/messages";
 
 const CreateTask: React.FC<{ setPage: Function; refreshTaskList:Function}> = ({setPage , refreshTaskList}) => {
   type Landmark = { value: string };
@@ -70,11 +69,10 @@ const CreateTask: React.FC<{ setPage: Function; refreshTaskList:Function}> = ({s
   const [errors, setErrors] = useState<any>({});
   const [isOn, setIsOn] = useState(false);
   const [formData, setFormData] = useState<FormDataType>({name:"", landmarks:"", estimate_ex_date: null as Date | null,note: "", assigned_users:[],latitude:"32.709240759054076",longitude:"74.8633072414406"});
-  const dispatch = useDispatch();
 
   const getUsers = async()=> {
     const resUsers = await getFromServer("/task_flow/get-users-with-landmarks/");
-    if (resUsers.status=== 200 || resUsers.status === 201){
+    if (resUsers.status){
         const temp:any = [];
         const LandMarkData:any = {};
         resUsers.data.forEach((element:any) => {
@@ -87,36 +85,29 @@ const CreateTask: React.FC<{ setPage: Function; refreshTaskList:Function}> = ({s
           });
         });
         setOptiosUsers(temp)
-        // setThisOptionUsers(temp)
         setLandmarkWithUser(LandMarkData)
-    }else if(resUsers.status===401){
-      dispatch(logout())
     }
   }
   const getLandmark = async()=> {
       const resLandmark = await getFromServer("/structure/landmarks");
-      if (resLandmark.status=== 200 || resLandmark.status === 201){
+      if (resLandmark.status){
           const temp:any = [];
           resLandmark.data.results.forEach((element:any) => {
             temp.push({value:element.id,label:element.name})
           });
           setLandmarkData(resLandmark.data.results)
           setLandmarkList(temp)
-      }else if(resLandmark.status===401){
-        dispatch(logout())
       }
   }
   const getDistricts = async()=> {
       const resLandmark = await getFromServer("/structure/districts");
-      if (resLandmark.status=== 200 || resLandmark.status === 201){
+      if (resLandmark.status){
           const temp:any = [];
           resLandmark.data.results.forEach((element:any) => {
             temp.push({value:element.id,label:element.name})
           });
           setDistrictList(temp)
           console.log(temp)
-      }else if(resLandmark.status===401){
-        dispatch(logout())
       }
   }
 
@@ -228,16 +219,11 @@ const CreateTask: React.FC<{ setPage: Function; refreshTaskList:Function}> = ({s
       if (resTaskCreate.status==200 || resTaskCreate.status==201){
         refreshTaskList()
         setPage("main")
-        console.log(resTaskCreate.data)
-      }else if(resTaskCreate.status===401){
-        dispatch(logout())
+        showMessages(resTaskCreate.data.detail)
       }
       else{
-        console.log("Error Occured")
+        showErrorAlert(resTaskCreate.data.detail)
       }
-    
-      // console.log("Form Data Submitted:", formData);
-      // alert(JSON.stringify(formData, null, 2)); 
     }
   };
 

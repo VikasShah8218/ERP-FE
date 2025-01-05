@@ -1,8 +1,6 @@
 import { getFromServer } from '../../globals/requests';
 import { useEffect, useState } from 'react';
 import Stack from '@mui/material/Stack';
-import { useDispatch } from "react-redux";
-import { logout } from "../../app/slices/authSlice";
 import UserImage from "../../static/image/user.png";
 
 
@@ -10,15 +8,12 @@ import UserImage from "../../static/image/user.png";
 
 const ShowUsers:React.FC<{ setPage: Function; setMainUsers:any , setSelectedUser:any }> = ({setPage,setMainUsers,setSelectedUser}) => {
     const [users, setUsers] = useState([])
-    const dispatch = useDispatch(); 
 
     const getUsers = async()=> {
         const resUsers = await getFromServer("/accounts/get-all-user");
         if (resUsers.status){
             setUsers(resUsers.data.results)
             setMainUsers(resUsers.data.results)
-        }else if(resUsers.status===401){
-            dispatch(logout())
         }
     }
     const handleEditUser = (user: any) => {

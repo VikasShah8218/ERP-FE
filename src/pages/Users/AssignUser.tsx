@@ -1,17 +1,15 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useState, useEffect } from "react";
 import { getFromServer , postToServer} from "../../globals/requests";
-import { useDispatch } from "react-redux";
-import { logout } from "../../app/slices/authSlice";
 
 import Select from 'react-select'
+import { showMessages } from "../../globals/messages";
 
 const AssignUser: React.FC <{ setPage: Function, mainUsers:any}> = ({setPage, mainUsers})=>{
     const [optiosUsers,setOptiosUsers] = useState([])
     const [landmarkList,setLandmarkList] = useState([])
     const [userLinkedlandmarkList,setUserLinkedLandmarkList] = useState([])
     const [errors, setErrors] = useState<any>({});
-    const dispatch = useDispatch(); 
 
     const [formData, setFormData] = useState({
         user_id: "", // Task name
@@ -88,17 +86,12 @@ const AssignUser: React.FC <{ setPage: Function, mainUsers:any}> = ({setPage, ma
                 temp.push({value:element.id,label:element.name})
             });
             setLandmarkList(temp)
-        }else if(resLandmark.status===401){
-            dispatch(logout())
         }
     }
     const getLinkedUser = async()=> {
         const resLinkedUserLandmark = await getFromServer("/task_flow/get-users-with-landmarks/");
         if (resLinkedUserLandmark.status){
             setUserLinkedLandmarkList(resLinkedUserLandmark.data)
-            // console.log(resLinkedUserLandmark.data)
-        }else if(resLinkedUserLandmark.status===401){
-            dispatch(logout())
         }
     }
     const handleChange = (selected:any) => {
@@ -117,15 +110,12 @@ const AssignUser: React.FC <{ setPage: Function, mainUsers:any}> = ({setPage, ma
         setErrors({});
         
         const resTaskCreate = await postToServer("/task_flow/users-with-landmarks/",formData)
-        if (resTaskCreate.status==200 || resTaskCreate.status==201){
+        if (resTaskCreate.status === 200 || resTaskCreate.status === 201){
             getLinkedUser();
             setFormData({user_id: "",landmarks: []});
-
-        }else if(resTaskCreate.status===401){
-            dispatch(logout())
+            showMessages(resTaskCreate.data.detail)
         }
         else{
-            console.log("Error Occured")
             setErrors({})
         }
         }
