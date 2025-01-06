@@ -4,8 +4,8 @@ import store from "../app/store";
 import { logout, setRequestLoading } from "../app/slices/authSlice";
 
 // constants
-// const BASE_URL = "http://localhost:8000";
-const BASE_URL = 'http://13.53.197.82:8000';
+const BASE_URL = "http://localhost:8000";
+// const BASE_URL = 'http://13.53.197.82:8000';
 
 // const BASE_URL = "http://192.168.1.12:8000";
 
@@ -33,16 +33,19 @@ const getFromServer = async (url:any) => {
     const res = await axios.get(`${BASE_URL}${url}`, { headers: genHeaders() });
     store.dispatch(setRequestLoading(false))
     if (res.status === 200 || res.status === 201) {
+      store.dispatch(setRequestLoading(false))
       return { status: true, data: res.data, detail: res.data.detail };
     } else if(res.status===401){
-               store.dispatch(logout());;
-                return {}
-            }
+      store.dispatch(setRequestLoading(false))
+      store.dispatch(logout());;
+      return {}
+    }
     else {
       return { status:false};
     }
   } catch (error:any) {
     if (error.response && error.response.data && error.response.data.detail) {
+      store.dispatch(setRequestLoading(false))
       if(error.response.status===401){
         store.dispatch(logout());;
          return {}
@@ -60,12 +63,16 @@ const postToServer = async (url:string, data = {}) => {
       headers: genHeaders(),
     });
     store.dispatch(setRequestLoading(false))
-
-    if(res.status===401){store.dispatch(logout());;return {}
-   }
+    
+    if(res.status===401){
+      store.dispatch(setRequestLoading(false))
+      store.dispatch(logout());
+      return {}
+    }
     return { status: res.status, data: res.data };  
   } catch (error:any) {
     if (error.response) {
+      store.dispatch(setRequestLoading(false))
       if(error.response.status===401){store.dispatch(logout());; return {}}
       return { status: error.response.status, data: error.response.data };
     } else {
@@ -83,22 +90,24 @@ const postToServerFileUpload = async (url:string, data = new FormData()) => {
     });
     store.dispatch(setRequestLoading(false))
     if(res.status===401){
+      store.dispatch(setRequestLoading(false))
       store.dispatch(logout());;
-       return {}
-   }
+      return {}
+    }
     return { status: res.status, data: res.data };  
   } catch (error:any) {
     if (error.response) {
+      store.dispatch(setRequestLoading(false))
       if(error.response.status===401){
         store.dispatch(logout());;
-         return {}
+        return {}
       }
       return { 
         status: error.response.status, 
         data: error.response.data 
       };
     } else {
-      // General fallback when error.response is undefined
+      store.dispatch(setRequestLoading(false))
       return { status: false, data: "An error occurred" };
     }
   }
@@ -114,20 +123,22 @@ const patchToServer = async (url:string, data = {}) => {
     store.dispatch(setRequestLoading(false))
     if(res.status===401){
       store.dispatch(logout());;
-       return {}
-   }
+      return {}
+    }
     return { status: res.status, data: res.data };  
   } catch (error:any) {
+    store.dispatch(setRequestLoading(false))
     if (error.response) {
       if(error.response.status===401){
         store.dispatch(logout());;
-         return {}
+        return {}
       }
       return { 
         status: error.response.status, 
         data: error.response.data 
       };
     } else {
+      store.dispatch(setRequestLoading(false))
       return { status: false, detail: "An error occurred" };
     }
   }

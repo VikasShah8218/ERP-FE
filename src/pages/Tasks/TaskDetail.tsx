@@ -345,7 +345,7 @@ const TaskDetail:React.FC<{ setPage: Function; selectedTask: any ,setSelectedTas
         const [selectedMedia, setSelectedMedia] = useState<MediaItem | null>(null);
         const closeFullView = () => setSelectedMedia(null);
         return (
-            <div className="p-4">
+            <div className="">
                 <h3 className="text-lg font-semibold mb-2">Media Gallery</h3>
                 <div className="flex space-x-2 overflow-x-auto p-2 bg-gray-800 rounded-md">
                 {!(!selectedTask.is_started || selectedTask.is_complete )? <div onClick={openFile} className="min-w-[70px] min-h-[70px] bg-gray-700 flex items-center justify-center cursor-pointer rounded-md">
@@ -536,8 +536,8 @@ const TaskDetail:React.FC<{ setPage: Function; selectedTask: any ,setSelectedTas
                             className="w-full rounded-lg border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary dark:disabled:bg-black">
                         </textarea>
                         {Object.keys(userReallocateMap).length > 0 && (
-                            <div className="p-4">
-                                <h2 className="text-lg font-bold mb-4">User Reallocation Map</h2>
+                            <div className="mt-4 mb-5">
+                                <h2 className="text-sm font-bold mb-4">User Reallocation Map</h2>
                                 <div className="flex flex-wrap gap-2">
                                 {Object.entries(userReallocateMap).map(([user1, user2], index) => (
                                     <div
@@ -553,7 +553,6 @@ const TaskDetail:React.FC<{ setPage: Function; selectedTask: any ,setSelectedTas
                             </div>
                         )}
                         <div>
-                            {/* Other UI components */}
                             <MediaGallery mediaData={taskMedia} />
                         </div>
                     </div>
@@ -626,8 +625,8 @@ const TaskDetail:React.FC<{ setPage: Function; selectedTask: any ,setSelectedTas
 
             <div className="mt-5">
                 <Stack spacing={2} direction="row">
-                    <Button onClick={handelTaskComplete} className="mr-4" variant="contained" disabled={!selectedTask.is_started || selectedTask.is_complete}>Task Completed</Button>
-                    <Button onClick={handelAccept} className="mr-4" variant="contained" disabled={selectedTask.is_complete}>Accept</Button>
+                    <Button onClick={handelTaskComplete} className="mr-4" variant="contained" disabled={!selectedTask.is_started || selectedTask.is_complete || !(taskTrakeData.taskComplete === "100%")}>Task Completed</Button>
+                    <Button onClick={handelAccept} className="mr-4" variant="contained" disabled={selectedTask.is_complete || selectedTask.is_started}>Accept</Button>
                 </Stack>
             </div>
 

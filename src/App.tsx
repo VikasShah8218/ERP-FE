@@ -52,7 +52,7 @@ function App() {
   }, [pathname]);
 
   // useEffect(() => {
-  //   setTimeout(() => setLoading(false), 1000);
+  //   document.body.style.zoom = '90%';
   // }, []);
 
   const isAuthPage = pathname.startsWith('/auth');
