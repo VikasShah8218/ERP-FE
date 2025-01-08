@@ -55,7 +55,8 @@ const UserDetail: React.FC = () => {
   return (
     <div className="p-4 bg-gray-900 text-white">
       <h2 className="text-xl font-bold mb-6 text-center">User Details</h2>
-      <div className="grid grid-cols-4 gap-4">
+      {/* <div className="grid grid-cols-4 gap-4"> */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
           <div  className="p-4 bg-gray-800 rounded-lg shadow hover:shadow-lg transition">
             <div className="flex items-center justify-between">
               <span className="font-semibold">{selectedUser.username}</span>
