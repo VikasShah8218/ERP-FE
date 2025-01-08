@@ -15,7 +15,7 @@ const UpdateUser: React.FC <{ setPage: Function; selectedUser: any }> = ({setPag
     department: selectedUser.department,
     username: selectedUser.username,
     password: selectedUser.password,
-    employee_code:selectedUser.employee_code,
+    client_id:selectedUser.client_id,
     image: null,
   });
 
@@ -47,7 +47,7 @@ const UpdateUser: React.FC <{ setPage: Function; selectedUser: any }> = ({setPag
     if (!formData.work_location.trim()) validationErrors.work_location = "Work location is required.";
     if (!formData.department.trim()) validationErrors.department = "Department is required.";
     if (!formData.address.trim()) validationErrors.address = "Address is required.";
-    if (!formData.employee_code.trim()) validationErrors.employee_code = "Employee Code is required.";
+    if (!formData.client_id.trim()) validationErrors.client_id = "Employee Code is required.";
     if (!formData.username.trim()) validationErrors.username = "Username is required.";
     return validationErrors;
   };
@@ -308,12 +308,12 @@ const UpdateUser: React.FC <{ setPage: Function; selectedUser: any }> = ({setPag
 
               <div className="w-full xl:w-1/2">
               <label className="mb-2.5 block text-black dark:text-white">
-                Employee Code <span className="text-meta-1">*</span>
+                Client Id <span className="text-meta-1">*</span>
               </label>
               <input
                 type="text"
                 name="employee_code"
-                value={formData.employee_code}
+                value={formData.client_id}
                 onChange={handleChange}
                 placeholder="Enter employee_code"
                 className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"

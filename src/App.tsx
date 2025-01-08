@@ -10,7 +10,6 @@ import Chart from './pages/Chart';
 import ECommerce from './pages/Dashboard/ECommerce';
 import FormElements from './pages/Form/FormElements';
 import FormLayout from './pages/Form/FormLayout';
-import Profile from './pages/Profile';
 import Settings from './pages/Settings';
 import Tables from './pages/Tables';
 import Alerts from './pages/UiElements/Alerts';
@@ -25,6 +24,7 @@ import { fas } from "@fortawesome/free-solid-svg-icons"; // Solid icons
 import { fab } from "@fortawesome/free-brands-svg-icons"; // Brand icons
 import { ToastContainer } from "react-toastify";
 import RequestLoader from './components/widgets/RequestLoader';
+import UsersProfile from './pages/UserProfile';
 import "react-toastify/dist/ReactToastify.css";
 
 library.add(fas, fab);
@@ -125,7 +125,8 @@ function App() {
                 element={
                   <>
                     <PageTitle title="Profile | TailAdmin - Tailwind CSS Admin Dashboard Template" />
-                    <Profile />
+                    {/* <Profile /> */}
+                    <UsersProfile/>
                   </>
                 }
               />

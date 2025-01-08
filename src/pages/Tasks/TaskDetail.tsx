@@ -8,7 +8,7 @@ import Select from 'react-select'
 import PDFImage from '../../static/image/pdf.png'
 import { getCurrentLocation ,getPlaceName } from "../../utlis/locationUtils";
 import { showMessages , showErrorAlert} from '../../globals/messages';
-import { faCloudArrowUp,faPlus,faAngleLeft,faPaperPlane,faCheck} from '@fortawesome/free-solid-svg-icons';
+import { faCloudArrowUp,faPlus,faAngleLeft,faPaperPlane,faCheck,faFlagCheckered,faHourglassHalf,faShareFromSquare} from '@fortawesome/free-solid-svg-icons';
 
 
 const TaskDetail:React.FC<{ setPage: Function; selectedTask: any ,setSelectedTask:Function, refreshTaskList:Function, optionUsers:any ,setOptionUsers:Function}> = ({setPage,selectedTask,refreshTaskList,optionUsers,setSelectedTask}) => {
@@ -26,6 +26,7 @@ const TaskDetail:React.FC<{ setPage: Function; selectedTask: any ,setSelectedTas
     const [placeName, setPlaceName] = useState<string>("");
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isRemoveModalOpen, setIsRemoveModalOpen] = useState(false);
+    const [isReAllocateModalOpen, setIsReAllocateModalOpen] = useState(false);
     const [taskMedia, setTaskMedia] = useState<any>([]);
     const [selectedRemoveUser, setSelectedRemoveUser] = useState<any>();
     const [errors, setErrors] = useState<any>({});
@@ -251,7 +252,9 @@ const TaskDetail:React.FC<{ setPage: Function; selectedTask: any ,setSelectedTas
             else{
                 showErrorAlert(response.data.detail);
             }
-    }
+        }
+        setIsReAllocateModalOpen(false)
+        setErrors({})
     }
     const handelCompleteLandMark = async () => {
         const validationErrors = validate3();
@@ -483,15 +486,15 @@ const TaskDetail:React.FC<{ setPage: Function; selectedTask: any ,setSelectedTas
                 {taskTrakeData && taskTrakeData.totalLandmarks ? (
                 <div className="flex gap-3 text-sm">
                     <div className="text-gray-300 flex items-center gap-1">
-                    <FontAwesomeIcon icon="fa-solid fa-building-flag" />{" "}
+                    <FontAwesomeIcon icon={faFlagCheckered} />{" "}
                     {taskTrakeData.totalLandmarks}
                     </div>
                     <div className="text-gray-300 flex items-center gap-1">
-                    <FontAwesomeIcon icon="fa-solid fa-spinner" />{" "}
+                    <FontAwesomeIcon icon={faHourglassHalf} />{" "}
                     {taskTrakeData.landmarksnotComplete}
                     </div>
                     <div className="text-green-400 flex items-center gap-1">
-                    <FontAwesomeIcon icon="fa-solid fa-check" />{" "}
+                    <FontAwesomeIcon icon={faCheck} />{" "}
                     {taskTrakeData.taskComplete}
                     </div>
                 </div>
@@ -512,6 +515,9 @@ const TaskDetail:React.FC<{ setPage: Function; selectedTask: any ,setSelectedTas
                         {user.first_name}
                     </div>
                 ))}
+                <div title="Reallocation"  onClick={()=>{ setIsReAllocateModalOpen(true) }} className="bg-blue-900 cursor-pointer hover:bg-blue-500 font-semibold text-white px-3 py-1 rounded-md text-sm shadow-md whitespace-nowrap">
+                    <FontAwesomeIcon icon={faShareFromSquare} />
+                </div>
             </div>
 
             <div className="rounded-sm mt-2 border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
@@ -581,27 +587,7 @@ const TaskDetail:React.FC<{ setPage: Function; selectedTask: any ,setSelectedTas
 
             {/* <div className="flex flex-wrap gap-4 mt-2"> */}
             <div className="gap-4 mt-2 flex flex-col lg:flex-row">
-
-                {/* Reallocate To */}
-                <div className="flex w-full lg:w-1/2 items-center lg:flex-row flex-col z-2">
-                    <div className="flex-grow w-full lg:w-auto">
-                    <label className="mb-1 block text-sm font-medium text-black dark:text-white">
-                        Reallocate To <span className="text-red-500">*</span>
-                    </label>
-                    <div className="relative z-20 bg-transparent dark:bg-form-input">
-                        <div style={{display:"flex"}}>
-                            <div style={{width:"100%"}}>
-                                <Select options={optionUsers} styles={customStyles} onChange={handelselectedUser1} />
-                            </div>
-                            <button type="button" onClick={handelReallocate} disabled={!selectedTask.is_started || selectedTask.is_complete} className={`ml-0 lg:ml-2 lg:mt-0 rounded-lg px-4 py-2 text-sm transition ${!selectedTask.is_started || selectedTask.is_complete ? "bg-gray-400 text-gray-200 cursor-not-allowed": "bg-primary text-white hover:bg-primary-dark"}`}>
-                                <FontAwesomeIcon icon={faCheck} />
-                            </button>
-                        </div>
-                        {errors.re_allocate_to && <p className="mt-1 text-sm text-red-500">{errors.re_allocate_to}</p>}
-                    </div>
-                    </div>
-                </div>
-
+               
                 {/* Select Completed Landmark */}
                 <div className="flex w-full lg:w-1/2 items-center lg:flex-row flex-col z-1">
                     <div className="flex-grow w-full lg:w-auto">
@@ -670,6 +656,44 @@ const TaskDetail:React.FC<{ setPage: Function; selectedTask: any ,setSelectedTas
                         </button>
                         <button onClick={handelRemoveUser} className="w-[48%] px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
                             Remove
+                        </button>
+                    </div>
+                </div>
+            </div>
+            )}
+
+            {(isReAllocateModalOpen )&& (
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50" style={{backdropFilter:"blur(2px)"}}>
+                {/* Modal Content */}
+                <div className="bg-black rounded-lg shadow-lg w-11/12 max-w-md mx-auto p-5">
+                    <h3 className="text-lg font-semibold text-white-800 mb-4 text-center">Please Conform    </h3>
+                    <div className="mb-5 text-center text-red-500 text-sm">
+                        <div className="flex w-full  items-center lg:flex-row flex-col z-2">
+                        <div className="flex-grow w-full lg:w-auto">
+                        <label className="mb-1 block text-sm font-medium text-black dark:text-white">
+                            Reallocate To <span className="text-red-500">*</span>
+                        </label>
+                        <div className="relative z-20 bg-transparent dark:bg-form-input">
+                            <div style={{display:"flex"}}>
+                                <div style={{width:"100%"}}>
+                                    <Select options={optionUsers} styles={customStyles} onChange={handelselectedUser1} />
+                                </div>
+                                {/* <button type="button" onClick={handelReallocate} disabled={!selectedTask.is_started || selectedTask.is_complete} className={`ml-0 lg:ml-2 lg:mt-0 rounded-lg px-4 py-2 text-sm transition ${!selectedTask.is_started || selectedTask.is_complete ? "bg-gray-400 text-gray-200 cursor-not-allowed": "bg-primary text-white hover:bg-primary-dark"}`}>
+                                    <FontAwesomeIcon icon={faCheck} />
+                                </button> */}
+                            </div>
+                            {errors.re_allocate_to && <p className="mt-1 text-sm text-red-500">{errors.re_allocate_to}</p>}
+                        </div>
+                        </div>
+                        </div>
+                    </div>
+                    
+                    <div className="flex justify-between">
+                        <button  onClick={()=>{ setIsReAllocateModalOpen(false)}} className="w-[48%] px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-400">
+                            Cancel
+                        </button>
+                        <button onClick={handelReallocate} className="w-[48%] px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            Reallocate
                         </button>
                     </div>
                 </div>
