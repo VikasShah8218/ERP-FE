@@ -65,7 +65,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
       <div className="flex items-center justify-between gap-2 px-6 py-5.5 lg:py-6.5">
         <NavLink to="/">
           <div className="E-loggo" style={{color:"#10b981", fontSize:"30px",fontWeight:"bolder",padding:"10px",border:"1px solid white",borderRadius:"10px"}}>
-          <h1>ESSI ERP</h1>
+            <h1>ESSI ERP</h1>
           </div>
         </NavLink>
 
@@ -257,12 +257,9 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
               
               <li>
                 <NavLink
-                  to="/settings"
+                  to="/store"
                   className={`group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4 ${
-                    pathname.includes('settings') &&
-                    'bg-graydark dark:bg-meta-4'
-                  }`}
-                >
+                    pathname.includes('settings') && 'bg-graydark dark:bg-meta-4'}`}>
                   <svg
                     className="fill-current"
                     width="18"

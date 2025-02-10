@@ -4,9 +4,9 @@ import store from "../app/store";
 import { logout, setRequestLoading } from "../app/slices/authSlice";
 
 // constants
-// const BASE_URL = "http://localhost:8000";
+const BASE_URL = "http://localhost:8000";
 // const BASE_URL = 'http://13.53.197.82:8000';
-const BASE_URL = 'https://ess-be.techkingdom.in';
+// const BASE_URL = 'https://ess-be.techkingdom.in';
 
 // const BASE_URL = "http://192.168.1.12:8000";
 
@@ -39,7 +39,7 @@ const getFromServer = async (url:any) => {
     } else if(res.status===401){
       store.dispatch(setRequestLoading(false))
       store.dispatch(logout());;
-      return {}
+      return {status:false}
     }
     else {
       return { status:false};
@@ -49,7 +49,7 @@ const getFromServer = async (url:any) => {
       store.dispatch(setRequestLoading(false))
       if(error.response.status===401){
         store.dispatch(logout());;
-         return {}
+         return {status:false}
       }
       return { status: error.response.status, detail: error.response.data.detail };
     } else return { status: false, detail: ERROR_MSG };

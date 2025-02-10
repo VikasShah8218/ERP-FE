@@ -68,7 +68,7 @@ const ShowUsers:React.FC<{ setPage: Function; setMainUsers:any , setSelectedUser
                 <tr key={key}>
                     <td className="border-b border-[#eee] py-5 px-4 pl-9 dark:border-strokedark xl:pl-11">
                     <div className="h-12.5 w-15 rounded-md">
-                        <img src={ user.image ? `data:image/jpeg;base64,${user.image}`: UserImage} alt="User"/>
+                        <img src={ user.image ? user.image : UserImage} alt="User"/>
                     </div>
                     </td>
                     <td className="border-b border-[#eee] py-5 px-4 dark:border-strokedark">

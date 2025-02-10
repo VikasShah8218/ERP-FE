@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { Route, Routes, useLocation } from 'react-router-dom';
 
 // import Loader from './common/Loader';
@@ -22,38 +22,45 @@ import Tasks from './pages/Tasks'
 import { library } from "@fortawesome/fontawesome-svg-core";
 import { fas } from "@fortawesome/free-solid-svg-icons"; // Solid icons
 import { fab } from "@fortawesome/free-brands-svg-icons"; // Brand icons
-import { ToastContainer } from "react-toastify";
 import RequestLoader from './components/widgets/RequestLoader';
 import UsersProfile from './pages/UserProfile';
 import "react-toastify/dist/ReactToastify.css";
+import { initializeWebSocket } from "./wsConnection";
+import { Flip ,ToastContainer } from "react-toastify";
+import {toast } from 'react-toastify';
+import Store from './pages/Store';
+import Products from './pages/Store/Products';
+
+
 
 library.add(fas, fab);
 
 function App() {
   const authenticated = useSelector((state:any) => state.auth.authenticated);
   const isLoading = useSelector((state:any) => state.auth.requestLoading);
+  const wsMessage = useSelector((state: any) => state.auth.wsMessage?.message); 
+
   const navigate = useNavigate();
 
-  // const [loading, setLoading] = useState<boolean>(false);
   const { pathname } = useLocation();
 
   useEffect(() => {
-    if (authenticated){
-      navigate('/');
-    }
-    else{
-      navigate('/auth/signin');
-
-    }
+    if (authenticated){navigate('/');}
+    else{navigate('/auth/signin');}
   }, [authenticated]);
 
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [pathname]);
 
-  // useEffect(() => {
-  //   document.body.style.zoom = '90%';
-  // }, []);
+  useEffect(() => {
+    const ws:any = initializeWebSocket();
+    return () => {ws.close();};
+  }, []);
+
+  // useEffect(()=>{
+  //   toast.success(wsMessage?.CONVERSATION)
+  // },[wsMessage])
 
   const isAuthPage = pathname.startsWith('/auth');
 
@@ -79,13 +86,12 @@ function App() {
               }
             />
           </Routes>
-          <ToastContainer position="bottom-right" autoClose={10000} theme="colored" />
+          <ToastContainer position="bottom-right" autoClose={5000} limit={5} hideProgressBar={false}  newestOnTop={false} closeOnClick={false} rtl={false} pauseOnFocusLoss draggable pauseOnHover theme="dark"  transition={Flip} />
           </>
         ) : (
           <DefaultLayout>
             <Routes>
-              <Route
-                index
+              <Route index
                 element={
                   <>
                     <PageTitle title="eCommerce Dashboard | TailAdmin - Tailwind CSS Admin Dashboard Template" />
@@ -93,8 +99,7 @@ function App() {
                   </>
                 }
               />
-              <Route
-                path="/tasks"
+              <Route path="/tasks"
                 element={
                   <>
                     <PageTitle title="Tasks" />
@@ -102,8 +107,23 @@ function App() {
                   </>
                 }
               />
-              <Route
-                path="/calendar"
+              <Route path="/store"
+                element={
+                  <>
+                    <PageTitle title="Tasks" />
+                    <Store />
+                  </>
+                }
+              />
+              <Route path="/store/products"
+                element={
+                  <>
+                    <PageTitle title="Products" />
+                    <Products />
+                  </>
+                }
+              />
+              <Route path="/calendar"
                 element={
                   <>
                     <PageTitle title="Calendar | TailAdmin - Tailwind CSS Admin Dashboard Template" />
@@ -111,8 +131,7 @@ function App() {
                   </>
                 }
               />
-              <Route
-                path="/users"
+              <Route path="/users"
                 element={
                   <>
                     <PageTitle title="Show Users" />
@@ -198,6 +217,7 @@ function App() {
           </DefaultLayout>
         )
       }
+         
     </>
   )
  
