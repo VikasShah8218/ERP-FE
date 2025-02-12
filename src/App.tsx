@@ -27,9 +27,11 @@ import UsersProfile from './pages/UserProfile';
 import "react-toastify/dist/ReactToastify.css";
 import { initializeWebSocket } from "./wsConnection";
 import { Flip ,ToastContainer } from "react-toastify";
-import {toast } from 'react-toastify';
+// import {toast } from 'react-toastify';
 import Store from './pages/Store';
 import Products from './pages/Store/Products';
+import ProductCreate from './pages/Store/Products/ProductCreate';
+import Others from './pages/Store/Products/Others';
 
 
 
@@ -120,6 +122,22 @@ function App() {
                   <>
                     <PageTitle title="Products" />
                     <Products />
+                  </>
+                }
+              />
+              <Route path="/store/products/create"
+                element={
+                  <>
+                    <PageTitle title="Products Create" />
+                    <ProductCreate />
+                  </>
+                }
+              />
+              <Route path="/store/products/others"
+                element={
+                  <>
+                    <PageTitle title="Products Create" />
+                    <Others />
                   </>
                 }
               />

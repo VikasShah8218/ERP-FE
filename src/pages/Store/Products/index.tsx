@@ -1,9 +1,8 @@
-// import Product from "../../static/image/product.png"
-// import { Link } from "react-router-dom";
 import { getFromServer } from "../../../globals/requests";
 import { useEffect, useState } from "react";
 import {toast} from 'react-toastify';
 import ProductImg from "../../../static/image/product-img.png"
+import { Link } from "react-router-dom";
 
 
 const Products = () => {
@@ -56,11 +55,23 @@ const Products = () => {
                 ))}
             </select>
 
-            <input type="date" className="w-full md:w-1/4 p-2 border border-gray-300 rounded-md dark:border-strokedark dark:bg-boxdark dark:text-white"/>
+            {/* <input type="date" className="w-full md:w-1/4 p-2 border border-gray-300 rounded-md dark:border-strokedark dark:bg-boxdark dark:text-white"/> */}
 
             <button onClick={getProduct} className="ml-0 lg:ml-2 lg:mt-0 rounded-lg px-4 py-2 text-sm transition bg-primary text-white hover:bg-blue-700 ">
                 Search
             </button>
+
+            <Link to={"/store/products/create"}>
+                <button className="ml-0 lg:ml-2 lg:mt-0 rounded-lg px-4 py-2 text-sm transition bg-primary text-white hover:bg-blue-700 ">
+                   +
+                </button>
+            </Link>
+
+            <Link to={"/store/products/others"}>
+                <button className="ml-0 lg:ml-2 lg:mt-0 rounded-lg px-4 py-2 text-sm transition bg-primary text-white hover:bg-blue-700 ">
+                   +
+                </button>
+            </Link>
         </div>
         <div className="max-w-full overflow-x-auto mt-5">
             <table className="w-full table-auto">
