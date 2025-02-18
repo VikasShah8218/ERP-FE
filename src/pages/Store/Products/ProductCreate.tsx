@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { getFromServer, postToServerFileUpload } from "../../../globals/requests";
 import {toast} from 'react-toastify';
+import { useNavigate } from "react-router-dom";
 
 
 
@@ -18,6 +19,7 @@ const ProductCreate = () => {
     product_image: null,
     bill_image: null,
     });
+    const navigate = useNavigate();
 
     const [locationList, setLocationList] = useState<any[]>([]);
     const [categoryList, setCategoryList] = useState<any[]>([]);
@@ -67,6 +69,7 @@ const ProductCreate = () => {
       const response = await postToServerFileUpload("/store/products/",data);
       if(response.status== 201 || response.status == 200){
         toast.success("Product Created")
+        navigate("/store/products")
       }else{ toast.error(response.data.details) }
     };
 

@@ -6,21 +6,21 @@ import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 
 
-const Products = () => {
+const RequestList = () => {
     const navigate = useNavigate();
     const [locationList, setLocationList] = useState<any[]>([]);
     const [categoryList, setCategoryList] = useState<any[]>([]);
-    const [fetchedProducts, setFetchedProducts] = useState<any[]>([]);
+    const [fetchedRequest, setFetchedRequest] = useState<any[]>([]);
     const [selectedLocation, setSelectedLocation] = useState("");
     const [selectedcategory, setSelectedCategory] = useState("");
-    // const [groupList, setGroupList] = useState<any[]>([]);
+
     const getInitialList = async () => {
         const res1 = await getFromServer("/store/locations")
         const res2 = await getFromServer("/store/categories")
         if (res1.status && res2.status){
-            setLocationList(res1.data.results);
+            setLocationList(res1.data.results); 
             setCategoryList(res2.data.results);
-        } else{ toast.error("Something Went Wrong while fetching data")  }
+        } else{ toast.error("Something Went Wrong while fetching data")}
     }
 
     const handelLocationChange = (event: React.ChangeEvent<HTMLSelectElement>) => {setSelectedLocation(event.target.value);};
@@ -30,15 +30,15 @@ const Products = () => {
         if (!selectedLocation.trim()){ toast.error("Select Location");  return false; }
         if (!selectedcategory.trim()){ toast.error("Select Category");  return false; }
         const response = await getFromServer(`/store/products?location_id=${selectedLocation}&category_id=${selectedcategory}`);
-        if (response.status){setFetchedProducts(response.data.results);}
+        if (response.status){setFetchedRequest(response.data.results);}
     }
-    const getProductsDefault = async() => {
-        const response = await getFromServer(`/store/products/`);
-        if (response.status){setFetchedProducts(response.data.results);}
+    const getRequestList = async() => {
+        const response = await getFromServer(`/store/store-requests/`);
+        if (response.status){setFetchedRequest(response.data.results);}
         else{ toast.error("Something Went Wrong while fetching data");}
     }
 
-    useEffect(()=> {getInitialList();getProductsDefault();},[])
+    useEffect(()=> {getInitialList();getRequestList();},[])
     return( 
     <>
         <div className="w-full p-4 bg-white shadow-default dark:border-strokedark dark:bg-boxdark rounded-lg flex flex-col md:flex-row items-center gap-4">
@@ -68,9 +68,9 @@ const Products = () => {
                 Search
             </button>
 
-            <Link to={"/store/products/create"}>
+            <Link to={"/store/requests/create"}>
                 <button className="ml-0 lg:ml-2 lg:mt-0 rounded-lg px-4 py-2 text-sm transition bg-primary text-white hover:bg-blue-700 ">
-                   +
+                   Create Request
                 </button>
             </Link>
 
@@ -88,13 +88,13 @@ const Products = () => {
                     Image
                 </th>
                 <th className="min-w-[220px] py-4 px-4 font-medium text-black dark:text-white xl:pl-11">
-                    Name
+                    Subject
                 </th>
                 <th className="min-w-[150px] py-4 px-4 font-medium text-black dark:text-white">
-                    Modal
+                    Employee
                 </th>
                 <th className="min-w-[120px] py-4 px-4 font-medium text-black dark:text-white">
-                    Group
+                    Aprover
                 </th>
                 <th className="min-w-[120px] py-4 px-4 font-medium text-black dark:text-white">
                     Status
@@ -106,21 +106,21 @@ const Products = () => {
                 </tr>
             </thead>
             <tbody>
-                { fetchedProducts?.map((product:any)=> (
-                <tr  style={{cursor:"pointer"}} onClick={()=>{navigate(`/store/products/${product.id}`)}} >
+                { fetchedRequest?.map((pRequest:any)=> (
+                <tr  style={{cursor:"pointer"}} onClick={()=>{navigate(`/store/requests/${pRequest.id}`)}} >
                     <td className="border-b border-[#eee] py-5 px-4 pl-9 dark:border-strokedark xl:pl-11">
                         <div className="h-15.5 w-15 rounded-md">
-                            <img src={ product.product_image ? product.product_image : ProductImg} alt="User"/>
+                            <img src={ pRequest.product_image ? pRequest.product_image : ProductImg} alt="User"/>
                         </div>
                     </td>
                     <td className="border-b border-[#eee] py-5 px-4 pl-9 dark:border-strokedark xl:pl-11">
-                        <h5 className="font-medium text-black dark:text-white"> {product?.name}</h5>
+                        <h5 className="font-medium text-black dark:text-white"> {pRequest?.subject}</h5>
                     </td>
                     <td className="border-b border-[#eee] py-5 px-4 dark:border-strokedark">
-                        <p className="text-black dark:text-white">{product.model}</p>
+                        <p className="text-black dark:text-white">{pRequest.employee}</p>
                     </td>
                     <td className="border-b border-[#eee] py-5 px-4 dark:border-strokedark">
-                        <p className="text-black dark:text-white">{product.group}</p>
+                        <p className="text-black dark:text-white">{pRequest.approver}</p>
                     </td>
                     <td className="border-b border-[#eee] py-5 px-4 dark:border-strokedark">
                         <p className="text-black dark:text-white">
@@ -175,4 +175,4 @@ const Products = () => {
     </>
     )
 }
-export default Products;
+export default RequestList;

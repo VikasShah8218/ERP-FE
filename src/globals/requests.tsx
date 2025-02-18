@@ -63,21 +63,22 @@ const postToServer = async (url:string, data = {}) => {
     const res = await axios.post(`${BASE_URL}${url}`, data, {
       headers: genHeaders(),
     });
-    store.dispatch(setRequestLoading(false))
     
     if(res.status===401){
-      store.dispatch(setRequestLoading(false))
       store.dispatch(logout());
+      store.dispatch(setRequestLoading(false))
       return {}
     }
+    
+    store.dispatch(setRequestLoading(false))
     return { status: res.status, data: res.data };  
   } catch (error:any) {
+    console.log(error)
     if (error.response) {
+      if(error.response.status===401){store.dispatch(logout()); store.dispatch(setRequestLoading(false));  return {}}
       store.dispatch(setRequestLoading(false))
-      if(error.response.status===401){store.dispatch(logout());; return {}}
       return { status: error.response.status, data: error.response.data };
-    } else {
-      return { status: false, data: "An error occurred" };
+    } else {store.dispatch(setRequestLoading(false));return { status: false, data:{detail: "An error occurred"} };
     }
   }
 };
