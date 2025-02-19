@@ -1,82 +1,51 @@
 import { getFromServer } from "../../../globals/requests";
 import { useEffect, useState } from "react";
 import {toast} from 'react-toastify';
-import ProductImg from "../../../static/image/product-img.png"
+import AppealsImg from "../../../static/image/appeals.png"
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
+import { faL } from "@fortawesome/free-solid-svg-icons";
 
 
 const RequestList = () => {
     const navigate = useNavigate();
-    const [locationList, setLocationList] = useState<any[]>([]);
-    const [categoryList, setCategoryList] = useState<any[]>([]);
+    const [selectedDate, setSelectedDate] = useState<any>("");
+    const [selectedStatus, setSelectedStatus] = useState<any>("");
     const [fetchedRequest, setFetchedRequest] = useState<any[]>([]);
-    const [selectedLocation, setSelectedLocation] = useState("");
-    const [selectedcategory, setSelectedCategory] = useState("");
 
-    const getInitialList = async () => {
-        const res1 = await getFromServer("/store/locations")
-        const res2 = await getFromServer("/store/categories")
-        if (res1.status && res2.status){
-            setLocationList(res1.data.results); 
-            setCategoryList(res2.data.results);
-        } else{ toast.error("Something Went Wrong while fetching data")}
-    }
-
-    const handelLocationChange = (event: React.ChangeEvent<HTMLSelectElement>) => {setSelectedLocation(event.target.value);};
-    const handelCategoryChange = (event: React.ChangeEvent<HTMLSelectElement>) => {setSelectedCategory(event.target.value);};
-
-    const getProducts = async() => {
-        if (!selectedLocation.trim()){ toast.error("Select Location");  return false; }
-        if (!selectedcategory.trim()){ toast.error("Select Category");  return false; }
-        const response = await getFromServer(`/store/products?location_id=${selectedLocation}&category_id=${selectedcategory}`);
-        if (response.status){setFetchedRequest(response.data.results);}
-    }
     const getRequestList = async() => {
-        const response = await getFromServer(`/store/store-requests/`);
+        const response = await getFromServer(`/store/store-requests`);
+        if (response.status){setFetchedRequest(response.data.results);}
+        else{ toast.error("Something Went Wrong while fetching data");}
+    }
+    const filterRequest = async() => {
+        console.log(selectedDate)
+        if (selectedDate.trim() == "" ){return toast.error("Please select Date")}
+        const response = await getFromServer(`/store/store-requests?date=${selectedDate}&status=${selectedStatus}`);
         if (response.status){setFetchedRequest(response.data.results);}
         else{ toast.error("Something Went Wrong while fetching data");}
     }
 
-    useEffect(()=> {getInitialList();getRequestList();},[])
+    useEffect(()=> {getRequestList();},[])
     return( 
     <>
         <div className="w-full p-4 bg-white shadow-default dark:border-strokedark dark:bg-boxdark rounded-lg flex flex-col md:flex-row items-center gap-4">
-            <select className="w-full md:w-1/4 p-2 border border-gray-300 rounded-md dark:border-strokedark dark:bg-boxdark dark:text-white"
-             onChange={handelLocationChange}
-             value={selectedLocation}
-             >
-                <option>Select Location</option>
-                {locationList?.map((location:any)=>(
-                    <option value={location.id}>{location.name}</option>
-                ))}
-              
+           
+            <input type="date" value={selectedDate} onChange={(e:any)=>{setSelectedDate(e.target.value)}} className="w-full md:w-1/4 p-2 border border-gray-300 rounded-md dark:border-strokedark dark:bg-boxdark dark:text-white"/>
+            <select  value={selectedStatus}  onChange={(e:any) => setSelectedStatus(e.target.value)} className="p-2 border border-gray-300 rounded-md dark:border-strokedark dark:bg-boxdark dark:text-white">
+                <option value="">Select Status</option>
+                <option value="0">All</option>
+                <option value="1">Approved</option>
+                <option value="2">Not Approved</option>
+                <option value="3">Not Valid</option>
             </select>
-            <select className="w-full md:w-1/4 p-2 border border-gray-300 rounded-md dark:border-strokedark dark:bg-boxdark dark:text-white"
-            onChange={handelCategoryChange}
-            value={selectedcategory}
-            >
-                <option value="">Select Category</option>
-                {categoryList?.map((category:any)=>(
-                    <option value={category.id}>{category.name}</option>
-                ))}
-            </select>
-
-            {/* <input type="date" className="w-full md:w-1/4 p-2 border border-gray-300 rounded-md dark:border-strokedark dark:bg-boxdark dark:text-white"/> */}
-
-            <button onClick={getProducts} className="ml-0 lg:ml-2 lg:mt-0 rounded-lg px-4 py-2 text-sm transition bg-primary text-white hover:bg-blue-700 ">
+            <button onClick={filterRequest} className="ml-0 lg:ml-2 lg:mt-0 rounded-lg px-4 py-2 text-sm transition bg-primary text-white hover:bg-blue-700 ">
                 Search
             </button>
 
             <Link to={"/store/requests/create"}>
                 <button className="ml-0 lg:ml-2 lg:mt-0 rounded-lg px-4 py-2 text-sm transition bg-primary text-white hover:bg-blue-700 ">
                    Create Request
-                </button>
-            </Link>
-
-            <Link to={"/store/products/others"}>
-                <button className="ml-0 lg:ml-2 lg:mt-0 rounded-lg px-4 py-2 text-sm transition bg-primary text-white hover:bg-blue-700 ">
-                   +
                 </button>
             </Link>
         </div>
@@ -106,11 +75,11 @@ const RequestList = () => {
                 </tr>
             </thead>
             <tbody>
-                { fetchedRequest?.map((pRequest:any)=> (
-                <tr  style={{cursor:"pointer"}} onClick={()=>{navigate(`/store/requests/${pRequest.id}`)}} >
+                {fetchedRequest?.map((pRequest:any)=> (
+                <tr style={{cursor:"pointer"}} onClick={()=>{navigate(`/store/requests/${pRequest.id}`)}}>
                     <td className="border-b border-[#eee] py-5 px-4 pl-9 dark:border-strokedark xl:pl-11">
                         <div className="h-15.5 w-15 rounded-md">
-                            <img src={ pRequest.product_image ? pRequest.product_image : ProductImg} alt="User"/>
+                            <img src={ pRequest.product_image ? pRequest.product_image : AppealsImg} alt="User"/>
                         </div>
                     </td>
                     <td className="border-b border-[#eee] py-5 px-4 pl-9 dark:border-strokedark xl:pl-11">
@@ -124,20 +93,20 @@ const RequestList = () => {
                     </td>
                     <td className="border-b border-[#eee] py-5 px-4 dark:border-strokedark">
                         <p className="text-black dark:text-white">
-                            <p
-                                className={`inline-flex rounded-full bg-opacity-10 py-1 px-3 text-sm font-medium ${
-                                    true
-                                        ? "bg-danger text-danger" 
-                                        : false
-                                        ? "bg-warning text-warning"
-                                        : "bg-success text-success" 
+                            <p className={`inline-flex rounded-full bg-opacity-10 py-1 px-3 text-sm font-medium ${
+                                pRequest.status == "1"? "bg-success text-success":
+                                pRequest.status == "2"? "bg-danger text-danger":
+                                pRequest.status == "3"? "bg-primary text-primary":
+                                    "bg-warning text-warning"
+                                   
                                 }`}
                             >
-                                {false
-                                    ? "Scheduled" 
-                                    : true
-                                    ? "Private"
-                                    : "Public"}
+                            {
+                            pRequest.status == "1"? "Approved":
+                            pRequest.status == "2"? "Not Approved":
+                            pRequest.status == "3"? "Not Valid":
+                            "Pending"
+                            }
                             </p>
                         </p>
                     </td>
