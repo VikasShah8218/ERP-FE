@@ -1,9 +1,8 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { getFromServer, patchToServer } from "../../../globals/requests";
-import {toast} from 'react-toastify';
-
-
+import { toast } from 'react-toastify';
+import { useSelector } from "react-redux";
 
 interface RequestP {
     id: number,
@@ -24,37 +23,54 @@ const RequestViewPage = () => {
     const [conversation, setConversation] = useState("");
     const [pRequest, setPRequest] = useState<RequestP | null>(null);
     const [status, setStatus] = useState("");
+
+    const user = useSelector((state:any) => state.auth.user);
+
     const getInitialList = async () => {
         const response = await getFromServer(`/store/store-requests/${id}`)
-        if (response.status){setPRequest(response.data); setStatus(response.data.status)} 
+        if (response?.status){setPRequest(response?.data); setStatus(response?.data?.status)} 
         else{ toast.error("Something Went Wrong while fetching data")  }
     }
    
     const handleSendMessage = async() => {
         if (conversation.trim() === "") return ( toast.error("Please write message") );
         const response = await patchToServer(`/store/store-requests/${id}/add-conversation/`, {"conversation":conversation})
-        if (response.status == 200 || response.status == 201){getInitialList();toast.success("Conversation Added")}
+        if (response?.status == 200 || response?.status == 201){getInitialList();toast.success("Conversation Added")}
         else{toast.error("Something went wrong")};
-        console.log("Sending message:", conversation);
         setConversation("");
     };
 
     const ChangeStatus = async() => {
         if (status.trim() === "" ) return( toast.error("Please Select Status"));
         const response = await patchToServer(`/store/store-requests/${id}/change-status/`, {"status":status})
-        if (response.status == 200 || response.status == 201){getInitialList();toast.success("Status Updated")}
-        else{toast.error("Something went wrong")};
+        if (response?.status == 200 || response?.status == 201){getInitialList();toast.success("Status Updated")}
+        else{toast.error(response?.data?.detail)};
     }
 
     useEffect(()=> {getInitialList();},[])
+    // useEffect(()=> {},[user])
 
     return (
         <div className="max-w-3xl mx-auto p-6 bg-white shadow-lg rounded-lg dark:bg-boxdark dark:border-strokedark">
             {/* Request Details */}
-            <h2 className="text-2xl font-bold text-gray-800 dark:text-white">{pRequest?.subject}</h2>
-            <p className="text-gray-600 dark:text-gray-300">Requested by: {pRequest?.employee}</p>
-            <p className="text-gray-600 dark:text-gray-300">Approver: {pRequest?.approver}</p>
-            <p className="text-gray-600 dark:text-gray-300">Status: {pRequest?.status}</p>
+            <h2 className="mb-1 text-2xl font-bold text-gray-800 dark:text-white">{pRequest?.subject}</h2>
+            <p className="mb-1 text-gray-600 dark:text-gray-300">Requested by: {pRequest?.employee}</p>
+            <p className="mb-1 text-gray-600 dark:text-gray-300">Approver: {pRequest?.approver}</p>
+            <p className="mb-1 text-gray-600 dark:text-gray-300 flex">
+                Status: 
+                        <p className="ml-1 text-black dark:text-white">
+                            <p className={`inline-flex rounded-full bg-opacity-10 py-1 px-3 text-sm font-medium ${
+                                pRequest?.status == "1"? "bg-success text-success":
+                                pRequest?.status == "2"? "bg-danger text-danger":
+                                pRequest?.status == "3"? "bg-primary text-primary": "bg-warning text-warning"}`}>
+                            {
+                            pRequest?.status == "1"? "Approved":
+                            pRequest?.status == "2"? "Not Approved":
+                            pRequest?.status == "3"? "Not Valid":"Pending"
+                            }
+                            </p>
+                        </p>
+                </p>
             <p className="text-gray-600 dark:text-gray-300">Created on: {pRequest?.created_on}</p>
             {/* Items Requested in Table Format */}
             <div className="mt-4 border-t border-gray-300 dark:border-strokedark pt-4">
@@ -98,7 +114,7 @@ const RequestViewPage = () => {
 
                 <div className="mt-4 flex items-center">
                     <div className="mr-4">
-                        <select
+                        {user?.permissions?.includes("can_approve_request") && <select
                             className="w-full p-2 border border-gray-300 rounded-md dark:border-strokedark dark:bg-boxdark dark:text-white"
                             value={status}
                             onChange={(e) => setStatus(e.target.value)}
@@ -107,7 +123,7 @@ const RequestViewPage = () => {
                             <option value="1">Approved</option>
                             <option value="2">Not Approved</option>
                             <option value="3">Not Valid</option>
-                        </select>
+                        </select>}
                     </div>
                     <input
                         type="text"

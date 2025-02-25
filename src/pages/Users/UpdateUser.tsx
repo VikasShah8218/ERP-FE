@@ -75,10 +75,8 @@ const UpdateUser: React.FC <{ setPage: Function; selectedUser: any }> = ({setPag
       }
       const formDataToSubmit = { ...formData, image: base64Image };
       const userRes = await patchToServer(`/accounts/update-user/${selectedUser.id}/`,formDataToSubmit)
-      console.log("Form Data Submitted:", formDataToSubmit);
       if (userRes.status==200 || userRes.status==201){
         setPage("main")
-        console.log(userRes.data)
         showMessages(userRes.data.detail)
       }
       else{

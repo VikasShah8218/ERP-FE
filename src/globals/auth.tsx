@@ -8,6 +8,7 @@ const setAuthToken = (token:any) => {
 
 const loginUser = (token = null, user = {}) => {
   setAuthToken(token);
+  localStorage.removeItem("user");
   localStorage.setItem("user", JSON.stringify(user));
 };
 

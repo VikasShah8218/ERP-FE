@@ -63,7 +63,6 @@ const AssignUser: React.FC <{ setPage: Function, mainUsers:any}> = ({setPage, ma
     };
     const setUsers = async()=> {
         const temp:any = [];
-        // console.log(mainUsers)
         mainUsers.forEach((element:any) => {
             temp.push({value:element.id,label:element.username})
         });
@@ -95,7 +94,6 @@ const AssignUser: React.FC <{ setPage: Function, mainUsers:any}> = ({setPage, ma
         }
     }
     const handleChange = (selected:any) => {
-        // console.log(selected)
         setFormData((prev) => {
             return { ...prev, user_id: selected.value };
         });

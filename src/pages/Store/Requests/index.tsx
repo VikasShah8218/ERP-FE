@@ -4,8 +4,6 @@ import {toast} from 'react-toastify';
 import AppealsImg from "../../../static/image/appeals.png"
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
-import { faL } from "@fortawesome/free-solid-svg-icons";
-
 
 const RequestList = () => {
     const navigate = useNavigate();
@@ -19,7 +17,6 @@ const RequestList = () => {
         else{ toast.error("Something Went Wrong while fetching data");}
     }
     const filterRequest = async() => {
-        console.log(selectedDate)
         if (selectedDate.trim() == "" ){return toast.error("Please select Date")}
         const response = await getFromServer(`/store/store-requests?date=${selectedDate}&status=${selectedStatus}`);
         if (response.status){setFetchedRequest(response.data.results);}
@@ -34,7 +31,7 @@ const RequestList = () => {
             <input type="date" value={selectedDate} onChange={(e:any)=>{setSelectedDate(e.target.value)}} className="w-full md:w-1/4 p-2 border border-gray-300 rounded-md dark:border-strokedark dark:bg-boxdark dark:text-white"/>
             <select  value={selectedStatus}  onChange={(e:any) => setSelectedStatus(e.target.value)} className="p-2 border border-gray-300 rounded-md dark:border-strokedark dark:bg-boxdark dark:text-white">
                 <option value="">Select Status</option>
-                <option value="0">All</option>
+                <option value="0">Pending</option>
                 <option value="1">Approved</option>
                 <option value="2">Not Approved</option>
                 <option value="3">Not Valid</option>

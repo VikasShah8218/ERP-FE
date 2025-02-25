@@ -35,7 +35,6 @@ const UserDetail: React.FC = () => {
   }
 
   const handelUpdateData = async() => {
-    console.log(editData)
     const userRes = await patchToServer(`/accounts/update-user/${loggedInUser.id}/`,{[editData.label]:editData.value})
     if (userRes.status==200 || userRes.status==201){
       showMessages(userRes.data.detail)

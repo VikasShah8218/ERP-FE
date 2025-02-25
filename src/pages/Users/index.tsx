@@ -14,7 +14,6 @@ const Users :React.FC = () => {
     const [selectedUser, setSelectedUser] = useState<any>({});
 
     useEffect(()=>{
-      console.log(mainUsers)
     },[mainUsers])
 
   return (

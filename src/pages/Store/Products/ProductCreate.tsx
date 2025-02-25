@@ -52,20 +52,12 @@ const ProductCreate = () => {
     const handleSubmit = async(e:any) => {
       e.preventDefault();
       const data = new FormData();
-      console.log("Form Data:", formData);
       Object.entries(formData).forEach(([key, value]) => {
         if (value !== null && value !== undefined) {
-            // For file inputs, append them as files
-            if (key === "product_image" || key === "bill_image") {
-                if (value instanceof File) {
-                    data.append(key, value);
-                }
-            } else {
-                data.append(key, value.toString());
-            }
+            if (key === "product_image" || key === "bill_image") {if (value instanceof File) {data.append(key, value);}} 
+            else {data.append(key, value.toString());}
         }
       });
-      console.log(data)
       const response = await postToServerFileUpload("/store/products/",data);
       if(response.status== 201 || response.status == 200){
         toast.success("Product Created")

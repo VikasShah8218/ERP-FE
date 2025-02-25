@@ -35,11 +35,7 @@ const CreateRequest = () => {
 
     const createRequest = async() => {
         const requestData = {subject,approver,items,note,conversation};
-        console.log("Submitting Request:", requestData);
-        console.log("*-*-*-*-*-*-*-*-*-*-")
         const response = await postToServer("/store/store-requests/",requestData)
-        console.log(response)
-        console.log(response?.data?.id)
         if (response.status == 200 || response.status == 201){toast.success("New Request Added");navigate(`/store/requests/${response?.data?.id}`);}
         else{toast.error("Something Went Wrong")}
     }

@@ -79,7 +79,6 @@ const RegisterUser:React.FC<{ setPage: any}> = ({setPage}) => {
       }
       const formDataToSubmit = { ...formData, image: base64Image };
       const userRes = await postToServer("/accounts/create-users/",formDataToSubmit)
-      console.log("Form Data Submitted:", formDataToSubmit);
       if (userRes.status==200 || userRes.status==201){
         setPage("main")
         showMessages(userRes.data.detail)

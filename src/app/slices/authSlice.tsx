@@ -49,6 +49,7 @@ export const authSlice = createSlice({
       delete (action.payload).token
       loginUser(token, action.payload);
       state.authenticated = true;
+      state.user = action.payload;
     },
     logout: (state) => {
       state.authenticated = false;

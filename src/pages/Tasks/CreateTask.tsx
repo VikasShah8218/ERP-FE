@@ -107,7 +107,6 @@ const CreateTask: React.FC<{ setPage: Function; refreshTaskList:Function}> = ({s
             temp.push({value:element.id,label:element.name})
           });
           setDistrictList(temp)
-          console.log(temp)
       }
   }
 
@@ -147,7 +146,6 @@ const CreateTask: React.FC<{ setPage: Function; refreshTaskList:Function}> = ({s
         .map((landmark: any) => ({ value: landmark.id, label: landmark.name })); 
       allFilteredLandmarks = [...allFilteredLandmarks, ...filteredLandmarks];
     });
-    console.log(allFilteredLandmarks); 
     handelSelectedLandmark(allFilteredLandmarks);
   };
 
@@ -162,9 +160,6 @@ const CreateTask: React.FC<{ setPage: Function; refreshTaskList:Function}> = ({s
               return rest;
           }
       });
-
-      console.log(isOn ? "not ok" : "ok");
-
     };
 
     return (

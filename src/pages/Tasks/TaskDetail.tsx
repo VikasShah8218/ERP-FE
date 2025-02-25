@@ -293,7 +293,6 @@ const TaskDetail:React.FC<{ setPage: Function; selectedTask: any ,setSelectedTas
         setAddUserForm({add_users:tempL})
     }
     const handelAddUser = async() => {
-        console.log("Submitted");
         if(addUserForm.add_users.length===0){
             setErrors({addNewUser:"Please Select atleast One Employee"});
             return null;

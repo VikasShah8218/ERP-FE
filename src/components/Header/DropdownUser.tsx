@@ -20,7 +20,7 @@ const DropdownUser = () => {
 
   const [dropdownOpen, setDropdownOpen] = useState(false);
   useEffect(()=>{
-    console.log(loggedInUser)
+    console.log("User => ",loggedInUser.first_name)
   },[])
 
   return (

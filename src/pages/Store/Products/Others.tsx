@@ -37,7 +37,6 @@ const Others = () => {
         if ( !categoryForm.trim() ){ toast.error("Please Fill Form");  return 0;}
         const response = await postToServer("/store/categories/",{name:categoryForm})
         if (response.status == 201 || response.status == 200){ toast.success("Category Created")}
-        console.log(categoryForm)
         setcategoryForm("")
         getInitialList()
         setisCategoryModel(false)
@@ -47,7 +46,6 @@ const Others = () => {
         if ( !locationForm.trim() ){ toast.error("Please Fill Form for Location");  return 0;}
         const response = await postToServer("/store/locations/",{name:locationForm})
         if (response.status == 201 || response.status == 200){ toast.success("Location Created")}
-        console.log(locationForm)
         setLocationForm("")
         getInitialList()
         setIslocationListModel(false)
@@ -57,7 +55,6 @@ const Others = () => {
         if ( !groupForm.trim() ){ toast.error("Please Fill Form for Group");  return 0;}
         const response = await postToServer("/store/product-group/",{name:groupForm})
         if (response.status == 201 || response.status == 200){ toast.success("Group Created")}
-        console.log(groupForm)
         setGroupForm("")
         getInitialList()
         setIsGroupModel(false)
@@ -185,7 +182,6 @@ return (
                    <input  type="text"
                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                      setcategoryForm(e.target.value);
-                     console.log(e.target.value);
                    }}
                    value={categoryForm}
                    name="category"
@@ -215,7 +211,6 @@ return (
                    <input  type="text"
                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                     setLocationForm(e.target.value);
-                     console.log(e.target.value);
                    }}
                    value={locationForm}
                    name="category"
@@ -245,7 +240,6 @@ return (
                    <input  type="text"
                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                     setGroupForm(e.target.value);
-                     console.log(e.target.value);
                    }}
                    value={groupForm}
                    name="category"
