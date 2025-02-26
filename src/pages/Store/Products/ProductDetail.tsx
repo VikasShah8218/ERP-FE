@@ -101,15 +101,15 @@ const ProductDetail = () => {
 
           {/* Category & Group */}
           <div className="mt-4 flex flex-wrap gap-2">
-            <select name="category" onChange={updateFormData} value={formData.category} disabled={!user?.permissions.includes("can_update_product") }  className="w-full p-2 border border-gray-300 rounded-md dark:border-strokedark dark:bg-boxdark dark:text-white" required>
+            <select name="category" onChange={updateFormData} value={formData.category} disabled={!user?.permissions?.includes("can_update_product") }  className="w-full p-2 border border-gray-300 rounded-md dark:border-strokedark dark:bg-boxdark dark:text-white" required>
                 <option value="">Select Category</option>
                 {categoryList?.map((category:any)=>(<option value={category.id}>{category.name}</option>))}
             </select>
-            <select name="location" onChange={updateFormData} value={formData.location} disabled={!user?.permissions.includes("can_update_product") }  className="w-full p-2 border border-gray-300 rounded-md dark:border-strokedark dark:bg-boxdark dark:text-white" required>
+            <select name="location" onChange={updateFormData} value={formData.location} disabled={!user?.permissions?.includes("can_update_product") }  className="w-full p-2 border border-gray-300 rounded-md dark:border-strokedark dark:bg-boxdark dark:text-white" required>
               <option value="">Select Location</option>
               {locationList?.map((location:any)=>(<option value={location.id}>{location.name}</option>))}
             </select>
-            <select name="group"  onChange={updateFormData} value={formData.group} disabled={!user?.permissions.includes("can_update_product") }  className="w-full  p-2 border border-gray-300 rounded-md dark:border-strokedark dark:bg-boxdark dark:text-white" required>
+            <select name="group"  onChange={updateFormData} value={formData.group} disabled={!user?.permissions?.includes("can_update_product") }  className="w-full  p-2 border border-gray-300 rounded-md dark:border-strokedark dark:bg-boxdark dark:text-white" required>
               <option value="">Select Group</option>
               {pGroup?.map((group:any)=>(<option value={group.id}>{group.name}</option>))}
             </select>
