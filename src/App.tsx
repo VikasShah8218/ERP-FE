@@ -31,7 +31,9 @@ import RequestList from './pages/Store/Requests';
 import RequestDetail from './pages/Store/Requests/RequestDetail';
 import CreateRequest from './pages/Store/Requests/CreateRequest';
 
-
+import DailyEntry from './pages/Store/Entry';
+import CreateEntry from './pages/Store/Entry/CreateEntry';
+import EntryDetails from './pages/Store/Entry/EntryDetails';
 
 library.add(fas, fab);
 
@@ -92,6 +94,10 @@ function App() {
             <Route path="/store/requests" element={<><PageTitle title="Requests List" /> <RequestList /> </>} />
             <Route path="/store/requests/:id" element={<><PageTitle title="View Request" /> <RequestDetail /> </>} />
             <Route path="/store/requests/create" element={<><PageTitle title="Create Request" /> <CreateRequest /> </>} />
+
+            <Route path="/store/daily-entry" element={<><PageTitle title="Daily Entry" /> <DailyEntry /> </>} />
+            <Route path="/store/daily-entry/:id" element={<><PageTitle title="Daily Entry Detail" /> <EntryDetails /> </>} />
+            <Route path="/store/daily-entry/create" element={<><PageTitle title="Create Entry" /> <CreateEntry /> </>} />
 
           </Routes>
           <ToastContainer position="bottom-right" autoClose={5000} limit={5} hideProgressBar={false} newestOnTop={false} closeOnClick={false} rtl={false} pauseOnFocusLoss draggable pauseOnHover theme="dark" transition={Flip} />
