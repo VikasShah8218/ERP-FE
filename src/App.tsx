@@ -63,8 +63,52 @@ function App() {
 
   const isAuthPage = pathname.startsWith('/auth');
 
+  const enterFullScreen = () => {
+    const elem = document.documentElement as HTMLElement & {
+      mozRequestFullScreen?: () => Promise<void>;
+      webkitRequestFullscreen?: () => Promise<void>;
+      msRequestFullscreen?: () => Promise<void>;
+    };
+  
+    if (elem.requestFullscreen) {
+      elem.requestFullscreen();
+    } else if (elem.mozRequestFullScreen) {
+      elem.mozRequestFullScreen();
+    } else if (elem.webkitRequestFullscreen) {
+      elem.webkitRequestFullscreen();
+    } else if (elem.msRequestFullscreen) {
+      elem.msRequestFullscreen();
+    }
+  };
+  
+  useEffect(() => {
+    enterFullScreen();
+  
+    const onFullScreenChange = () => {
+      if (!document.fullscreenElement) {
+        enterFullScreen(); // Re-enter fullscreen if exited
+      }
+    };
+  
+    document.addEventListener("fullscreenchange", onFullScreenChange);
+    document.addEventListener("webkitfullscreenchange", onFullScreenChange);
+    document.addEventListener("mozfullscreenchange", onFullScreenChange);
+    document.addEventListener("MSFullscreenChange", onFullScreenChange);
+  
+    return () => {
+      document.removeEventListener("fullscreenchange", onFullScreenChange);
+      document.removeEventListener("webkitfullscreenchange", onFullScreenChange);
+      document.removeEventListener("mozfullscreenchange", onFullScreenChange);
+      document.removeEventListener("MSFullscreenChange", onFullScreenChange);
+    };
+  }, []);
+  
+
+
+
   return (
     <>
+      {enterFullScreen()}
       {isLoading && <RequestLoader />}
       {isAuthPage ? (
         <>
