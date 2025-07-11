@@ -81,34 +81,34 @@ function App() {
     }
   };
   
-  useEffect(() => {
-    enterFullScreen();
+  // useEffect(() => {
+  //   enterFullScreen();
   
-    const onFullScreenChange = () => {
-      if (!document.fullscreenElement) {
-        enterFullScreen(); // Re-enter fullscreen if exited
-      }
-    };
+  //   const onFullScreenChange = () => {
+  //     if (!document.fullscreenElement) {
+  //       enterFullScreen(); // Re-enter fullscreen if exited
+  //     }
+  //   };
   
-    document.addEventListener("fullscreenchange", onFullScreenChange);
-    document.addEventListener("webkitfullscreenchange", onFullScreenChange);
-    document.addEventListener("mozfullscreenchange", onFullScreenChange);
-    document.addEventListener("MSFullscreenChange", onFullScreenChange);
+  //   document.addEventListener("fullscreenchange", onFullScreenChange);
+  //   document.addEventListener("webkitfullscreenchange", onFullScreenChange);
+  //   document.addEventListener("mozfullscreenchange", onFullScreenChange);
+  //   document.addEventListener("MSFullscreenChange", onFullScreenChange);
   
-    return () => {
-      document.removeEventListener("fullscreenchange", onFullScreenChange);
-      document.removeEventListener("webkitfullscreenchange", onFullScreenChange);
-      document.removeEventListener("mozfullscreenchange", onFullScreenChange);
-      document.removeEventListener("MSFullscreenChange", onFullScreenChange);
-    };
-  }, []);
+  //   return () => {
+  //     document.removeEventListener("fullscreenchange", onFullScreenChange);
+  //     document.removeEventListener("webkitfullscreenchange", onFullScreenChange);
+  //     document.removeEventListener("mozfullscreenchange", onFullScreenChange);
+  //     document.removeEventListener("MSFullscreenChange", onFullScreenChange);
+  //   };
+  // }, []);
   
 
 
 
   return (
     <>
-      {enterFullScreen()}
+      {/* {enterFullScreen()} */}
       {isLoading && <RequestLoader />}
       {isAuthPage ? (
         <>
