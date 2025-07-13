@@ -5,6 +5,7 @@ import { logout, setRequestLoading } from "../app/slices/authSlice";
 
 // constants
 const BASE_URL = "http://localhost:8000";
+const WS_URL = "ws://localhost:8000";
 // const BASE_URL = 'http://13.53.197.82:8000';
 // const BASE_URL = 'https://ess-be.techkingdom.in';
 
@@ -184,4 +185,4 @@ const deleteFromServer = async (url:string, data = {}) => {
   }
 };
 
-export { getFromServer, postToServer, putToServer ,deleteFromServer,patchToServer,postToServerFileUpload ,BASE_URL};
+export { getFromServer, postToServer, putToServer ,deleteFromServer,patchToServer,postToServerFileUpload ,BASE_URL , WS_URL};

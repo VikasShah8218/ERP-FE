@@ -47,7 +47,7 @@ const UpdateUser: React.FC <{ setPage: Function; selectedUser: any }> = ({setPag
     if (!formData.work_location.trim()) validationErrors.work_location = "Work location is required.";
     if (!formData.department.trim()) validationErrors.department = "Department is required.";
     if (!formData.address.trim()) validationErrors.address = "Address is required.";
-    if (!formData.client_id.trim()) validationErrors.client_id = "Employee Code is required.";
+    // if (!formData.client_id.trim()) validationErrors.client_id = "Employee Code is required.";
     if (!formData.username.trim()) validationErrors.username = "Username is required.";
     return validationErrors;
   };
@@ -310,7 +310,7 @@ const UpdateUser: React.FC <{ setPage: Function; selectedUser: any }> = ({setPag
               </label>
               <input
                 type="text"
-                name="employee_code"
+                name="client_id"
                 value={formData.client_id}
                 onChange={handleChange}
                 placeholder="Enter employee_code"
