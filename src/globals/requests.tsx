@@ -4,10 +4,10 @@ import store from "../app/store";
 import { logout, setRequestLoading } from "../app/slices/authSlice";
 
 // constants
-const BASE_URL = "http://localhost:8000";
-const WS_URL = "ws://localhost:8000";
-// const BASE_URL = 'http://13.53.197.82:8000';
-// const BASE_URL = 'https://ess-be.techkingdom.in';
+// const BASE_URL = "http://localhost:8000";
+// const WS_URL = "ws://localhost:8000";
+const BASE_URL = 'http://essi-zm.viewdns.net:50020';
+const WS_URL = 'ws://essi-zm.viewdns.net:50020';
 
 // const BASE_URL = "http://192.168.1.12:8000";
 
